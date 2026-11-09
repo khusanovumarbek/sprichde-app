@@ -54,15 +54,15 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 .map-path-dots{fill:none;stroke:#ffffff;stroke-width:5;stroke-linecap:round;stroke-dasharray:0.1 26}
 html[data-theme="dark"] .map-path{stroke:#20412e}
 html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
-.day-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;z-index:5}
-.node-circle{width:58px;height:58px;border-radius:50%;border:4px solid #ffffff;background:linear-gradient(180deg,#41c375 0%,#28a361 60%,#1d8a54 100%);color:#fff;font-size:16px;font-weight:800;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 0 #14663c, 0 12px 18px #14663c44;transition:transform .12s}
-.node-circle:active{transform:translateY(2px) scale(.96)}
-.day-node.locked .node-circle{background:var(--surface-2);border-color:#ffffff;box-shadow:none;color:var(--muted);cursor:not-allowed;font-size:15px}
-.day-node.current .node-circle{background:linear-gradient(180deg,#3a6ad0 0%,#3157a4 100%);box-shadow:0 6px 0 #24417f, 0 0 0 6px #3157a433, 0 12px 18px #1d2b4b44;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 6px 0 #24417f, 0 0 0 5px #3157a433, 0 12px 18px #1d2b4b44}50%{box-shadow:0 6px 0 #24417f, 0 0 0 10px #3157a422, 0 12px 18px #1d2b4b44}}
+.day-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;z-index:5;cursor:pointer}
+.day-node.done .node-dot{background:var(--green);box-shadow:0 0 0 2px var(--green-dark)}
+.day-node.locked .node-dot{background:#dfe3ea;box-shadow:0 0 0 2px #d3d7e0}
+.day-node.current .node-dot{background:#3157a4;box-shadow:0 0 0 5px #3157a433}
 .day-label{font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
 .day-node.done .day-label{color:var(--green-dark)}
 .day-node.current .day-label{color:var(--blue)}
+.node-dot{width:18px;height:18px;border-radius:50%;border:3px solid #ffffff;background:var(--green-soft);box-shadow:0 0 0 2px #bcdcc4;transition:background .2s;cursor:pointer;display:grid;place-items:center}
+.node-check{font-size:8px;color:#fff;font-weight:800;line-height:1}
 .check{font-size:20px;line-height:1}
 
 .day-pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,8px);width:200px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 11px;z-index:30;box-shadow:0 14px 34px #1d2b4b33;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
@@ -73,9 +73,9 @@ html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
 .day-pop small{display:block;font-size:9.5px;color:var(--muted);margin-top:4px;line-height:1.5}
 .day-pop .lock-note{display:block;font-size:10.5px;color:#d2453c;font-weight:800;margin-top:5px}
 
-/* ---------- BUGUNGA QAYTISH ---------- */
-.today-btn{position:sticky;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:9px;height:46px;padding:0 22px;border:0;border-radius:24px;background:#3157a4;color:#fff;font:inherit;font-size:13px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 8px 24px #3157a455;z-index:15;margin-top:-56px}
-.today-btn:active{transform:translateX(-50%) scale(.96)}
+/* ---------- BUGUNGA QAYTISH (pastda, o'rtada) ---------- */
+.today-btn{display:flex;align-items:center;gap:9px;height:46px;padding:0 22px;border:0;border-radius:24px;background:#3157a4;color:#fff;font:inherit;font-size:13px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 8px 24px #3157a455;z-index:15;margin:18px auto 4px}
+.today-btn:active{transform:scale(.96)}
 .today-btn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.2}
 
 @media (max-width:420px){
@@ -110,13 +110,14 @@ html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
         <div class="stat-box"><small>O‘tilgan</small><b id="doneCount">0</b><span>91 kundan</span></div>
       </div>
     </div>
-    <button class="today-btn" id="goTodayBtn" type="button">
-      <svg viewBox="0 0 24 24"><path d="M12 8v8M8 12h8" /><circle cx="12" cy="12" r="9"/></svg>
-      Bugunga qaytish
-    </button>
   </div>
 
   <div class="map-wrap" id="mapWrap"></div>
+
+  <button class="today-btn" id="goTodayBtn" type="button">
+    <svg viewBox="0 0 24 24"><path d="M12 8v8M8 12h8" /><circle cx="12" cy="12" r="9"/></svg>
+    Bugunga qaytish
+  </button>
 </div>
 
 <script>
@@ -177,7 +178,7 @@ function buildNodes() {
     node.style.top = y + 'px';
     node.dataset.day = day;
     node.innerHTML = `
-      <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '<span class="check">✓</span>' : day}</button>
+      <span class="node-dot" role="button" tabindex="0" aria-label="${day}-kun">${done ? '<span class="node-check">✓</span>' : ''}</span>
       <span class="day-label">${day}-kun</span>
       <div class="day-pop" role="tooltip">
         <b>${lesson.de}</b>
@@ -185,8 +186,8 @@ function buildNodes() {
         <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
         ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
       </div>`;
-    const circle = node.querySelector('.node-circle');
-    circle.addEventListener('click', () => {
+    const dot = node.querySelector('.node-dot');
+    dot.addEventListener('click', () => {
       const willOpen = !node.classList.contains('open');
       wrap.querySelectorAll('.day-node.open').forEach((n) => n.classList.remove('open'));
       if (willOpen) node.classList.add('open');
