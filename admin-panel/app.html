@@ -332,8 +332,8 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
       <span class="j-go">Boshlash ›</span>
     </a>
 
-    <!-- Sinov darsi (do'stni taklif qilishdan tepasida) -->
-    <a class="feature tryout" href="trial.html">
+    <!-- Sinov darsi (do'stni taklif qilishdan tepasida) — o'tib bo'lgach yashiriladi -->
+    <a class="feature tryout" href="trial.html" id="tryoutCard" hidden>
       <span class="f-icon">🎬</span>
       <span class="f-body"><b>Sinov darsi <span class="badge-new">BEPUL</span></b><small>Sinab ko‘ring — 1-dars</small></span>
       <span class="f-arrow">›</span>
@@ -977,6 +977,14 @@ el('editProfileBtn').addEventListener('click', async () => {
   await Promise.all([loadProgress(), loadPaymentInfo(), loadPayments()]);
   paintJourney();
   paintProfile();
+  // Sinov darsi o'tib bo'lingan bo'lsa, Sinov darsi kartasini yashiramiz
+  const tryout = el('tryoutCard');
+  if (tryout) {
+    tryout.hidden = !!(
+      (progress && progress.trialDone) ||
+      (Array.isArray(progress && progress.completedDays) && progress.completedDays.includes(1))
+    );
+  }
 })();
 
 </script>

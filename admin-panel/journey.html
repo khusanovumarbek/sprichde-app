@@ -228,7 +228,12 @@ function renderPOIs() {
     poi.style.top = p.y + 'px';
     poi.innerHTML = `
       <button class="poi-btn" type="button" aria-label="${lm.de}">${lm.icon}</button>`;
-    poi.querySelector('.poi-btn').addEventListener('click', (ev) => showPoiPop(ev, lm));
+    const poiBtn = poi.querySelector('.poi-btn');
+    poiBtn.addEventListener('click', (ev) => showPoiPop(ev, lm));
+    poiBtn.addEventListener('mouseenter', (ev) => showPoiPop(ev, lm));
+    poiBtn.addEventListener('mouseleave', () => { poiPop.hidden = true; });
+    poiBtn.addEventListener('focus', (ev) => showPoiPop(ev, lm));
+    poiBtn.addEventListener('blur', () => { poiPop.hidden = true; });
     wrap.appendChild(poi);
   }
 }
@@ -259,7 +264,7 @@ function buildNodes() {
     circle.addEventListener('click', () => {
       // Ochiq kun — bosilganda dars sahifasiga o'tadi
       if (!locked) {
-        location.href = 'lesson.html?day=' + day;
+        location.href = day === 1 ? 'trial.html' : 'lesson.html?day=' + day;
         return;
       }
       const willOpen = !node.classList.contains('open');
