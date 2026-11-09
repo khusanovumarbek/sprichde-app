@@ -59,6 +59,12 @@ html[data-theme="dark"] .e-icon{background:#3c3218}
 (async function initTrial() {
   const me = await guard('student');
   if (!me) return;
+  // O'tib bo'lingan bo'lsa — sinov darsi sahifasi umuman ochilmaydi, sayohatga yo'naltiriladi
+  const initProgress = await authFetch('/api/progress').catch(() => null);
+  if (initProgress && Array.isArray(initProgress.completedDays) && initProgress.completedDays.includes(1)) {
+    location.replace('journey.html');
+    return;
+  }
 
   // Sinov darsi ko'rilgach — 1-kun o'tildi deb belgilanadi va Sinov darsi bo'limi yopiladi
   const btn = document.getElementById('doneBtn');
