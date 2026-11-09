@@ -7,7 +7,7 @@
  * Versiyani o'zgartirish uchun CACHE_VERSION ni oshiring.
  * ============================================================ */
 
-const CACHE_VERSION = 'v18';
+const CACHE_VERSION = 'v19';
 const PRECACHE = 'sprichde-static-' + CACHE_VERSION;
 const RUNTIME = 'sprichde-runtime-' + CACHE_VERSION;
 

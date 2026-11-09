@@ -56,6 +56,13 @@ html[data-theme="dark"] .map-path{stroke:#24433a}
 .day-pop span{display:block;font-size:11.5px;color:var(--text);margin-top:3px;font-weight:700}
 .day-pop small{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5}
 .day-pop .lock-note{display:block;font-size:10.5px;color:#d2453c;font-weight:800;margin-top:6px}
+
+/* ---------- Manzara bekatlari ---------- */
+.day-node.landmark .node-circle{width:94px;height:94px;border-width:4px}
+.day-node.landmark.current .node-circle{box-shadow:0 0 0 5px #3157a433, 0 8px 20px #1d2b4b33}
+.day-node.landmark .photo{position:absolute;inset:0;border-radius:50%;background-size:cover;background-position:center}
+.day-node.locked .photo{filter:grayscale(.9) brightness(.75)}
+.note{margin-top:16px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
 .note{margin-top:16px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
 
 @media (max-width:420px){
@@ -85,6 +92,17 @@ html[data-theme="dark"] .map-path{stroke:#24433a}
 
 <script>
 const TOTAL_DAYS = 91;
+/* Manzara bekatlari: shu kunlarda katta rasm tugmasi */
+const LANDMARKS = {
+  1:  { img: '1533929736458-ca588d08c8be', de: 'die Hauptstadt', uz: 'poytaxt', cap: 'Berlin — Germaniyaning poytaxti' },
+  7:  { img: '1467269204594-9661b134dd2b', de: 'die Altstadt', uz: 'eski shahar', cap: 'München — qadimiy eski shahar' },
+  16: { img: '1516483638261-f4dbaf036963', de: 'der Hafen', uz: 'port, bandargoh', cap: 'Hamburg — yirik port shahar' },
+  28: { img: '1464822759023-fed622ff2c3b', de: 'die Alpen', uz: 'Alplar tog‘lari', cap: 'Zugspitze — Germaniyaning eng baland cho‘qqisi' },
+  45: { img: '1548883354-7622d03aca27', de: 'die Hose', uz: 'shim', cap: 'Gap: „Ich trage eine Hose“ — Men shim kiyapman' },
+  64: { img: '1493863641943-9b68992a8d07', de: 'die Stadt', uz: 'shahar', cap: 'Rothenburg ob der Tauber — o‘rta asr qal‘a shahri' },
+  79: { img: '1520763185298-1b434c919102', de: 'die Tulpe', uz: 'lola', cap: 'Hollandiyadagi lola — Germaniyada ham mashhur gul' },
+  91: { img: '1524661135-423995f22d0b', de: 'der Fluss', uz: 'daryo', cap: 'Elbe — Germaniyadagi yirik daryo' },
+};
 const LESSONS = [
   { de: 'Hallo', uz: 'Salom' },
   { de: 'Wie heißt du?', uz: 'Isming nima?' },
@@ -132,19 +150,36 @@ function buildNodes() {
     const current = day === nextDay;
     const locked = !done && !current;
     const lesson = LESSONS[(day - 1) % LESSONS.length];
+    const lm = LANDMARKS[day];
     const node = document.createElement('div');
-    node.className = 'day-node' + (done ? ' done' : '') + (locked ? ' locked' : '') + (current ? ' current' : '');
+    node.className = 'day-node' + (done ? ' done' : '') + (locked ? ' locked' : '') + (current ? ' current' : '') + (lm ? ' landmark' : '');
     node.style.left = x + '%';
     node.style.top = y + 'px';
-    node.innerHTML = `
-      <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '✓' : day}</button>
-      <span class="day-label">${day}-kun</span>
-      <div class="day-pop" role="tooltip">
-        <b>${lesson.de}</b>
-        <span>— ${lesson.uz}</span>
-        <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
-        ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
-      </div>`;
+    if (lm) {
+      // Manzara bekat: katta rasm tugma, popover ichida so'z va izoh
+      node.innerHTML = `
+        <button class="node-circle" type="button" aria-label="${day}-kun">
+          <span class="photo" style="background-image:linear-gradient(rgba(0,0,0,.10),rgba(0,0,0,.35)),url('https://images.unsplash.com/photo-${lm.img}?auto=format&fit=crop&w=240&q=70')"></span>
+        </button>
+        <span class="day-label">${day}-kun</span>
+        <div class="day-pop" role="tooltip">
+          <b>${lm.de}</b>
+          <span>— ${lm.uz}</span>
+          <small>${lm.cap}</small>
+          <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
+          ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
+        </div>`;
+    } else {
+      node.innerHTML = `
+        <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '✓' : day}</button>
+        <span class="day-label">${day}-kun</span>
+        <div class="day-pop" role="tooltip">
+          <b>${lesson.de}</b>
+          <span>— ${lesson.uz}</span>
+          <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
+          ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
+        </div>`;
+    }
     const circle = node.querySelector('.node-circle');
     circle.addEventListener('click', () => {
       const willOpen = !node.classList.contains('open');
