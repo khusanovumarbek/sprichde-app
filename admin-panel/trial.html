@@ -60,17 +60,22 @@ html[data-theme="dark"] .e-icon{background:#3c3218}
   const me = await guard('student');
   if (!me) return;
 
+  // Sinov darsi ko'rilgach — 1-kun o'tildi deb belgilanadi va Sinov darsi bo'limi yopiladi
   const btn = document.getElementById('doneBtn');
   const hint = document.querySelector('.hint');
-
-  // Agar 1-kun allaqachon o'tilgan bo'lsa, qayta belgilash shart emas.
   try {
     const progress = await authFetch('/api/progress');
-    if (Array.isArray(progress.completedDays) && progress.completedDays.includes(1)) {
-      btn.textContent = '1-dars o‘tilgan ✓';
-      btn.classList.add('done');
-      hint.textContent = 'Sayohatni davom ettirish uchun sayohatga qayting.';
+    const done = Array.isArray(progress.completedDays) && progress.completedDays.includes(1);
+    if (!done) {
+      await authFetch('/api/progress/complete', {
+        method: 'POST',
+        body: JSON.stringify({ day: 1 }),
+      });
     }
+    btn.textContent = '1-dars o‘tilgan ✓';
+    btn.classList.add('done');
+    hint.textContent = 'Sayohatni davom ettirish uchun sayohatga qayting.';
+    return;
   } catch {}
 
   btn.addEventListener('click', async (e) => {
