@@ -48,7 +48,7 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 .stat-box span{font-size:11px;color:#ffffffaa}
 
 /* ---------- KUNLAR XARITASI ---------- */
-.map-wrap{position:relative;margin:16px 0 0;overflow:hidden}
+.map-wrap{position:relative;margin:60px 0 6px;overflow:hidden}
 .map-svg{display:block;width:100%;height:100%}
 .map-path{fill:none;stroke:var(--green-soft);stroke-width:8;stroke-linecap:round}
 .map-path-dots{display:none}
@@ -169,7 +169,7 @@ const LANDMARKS = {
 
 const wrap = document.getElementById('mapWrap');
 const STEP = 116;
-const TOP = 30;
+const TOP = 74;
 const MAP_HEIGHT = TOP + TOTAL_DAYS * STEP + 60;
 wrap.style.height = MAP_HEIGHT + 'px';
 
