@@ -224,20 +224,29 @@ document.addEventListener('click', (e) => {
 
 function renderPOIs() {
   wrap.querySelectorAll('.poi').forEach((p) => p.remove());
+  // Zik-zak tartibi: 1 ta o'ngda, 2 ta chapda (rasm tartibiga o'xshash)
+  const ZIGZAG = [1, -1, -1];
+  let idx = 0;
   for (const [dayStr, lm] of Object.entries(LANDMARKS)) {
     const day = Number(dayStr);
     const p = nodePoint(day - 1);
-    // Yo‘l qaysi tomonga kavislanagan bo'lsa, bekatni qarshisiga qo'yamiz
-    const side = p.xPx < 260 ? 1 : -1;
-    const off = 120;
+    const side = ZIGZAG[idx % ZIGZAG.length];
+    idx++;
+    let off = 120;
+    // Chegaradan tashqariga chiqib ketmasin
+    let poiX = p.xPx + side * off;
+    if (poiX > 460) poiX = p.xPx - off;
+    else if (poiX < 60) poiX = p.xPx + off;
+    poiX = Math.max(40, Math.min(480, poiX));
+    const effSide = poiX > p.xPx ? 1 : -1;
     const poi = document.createElement('div');
     poi.className = 'poi';
-    poi.style.left = (((p.xPx + side * off) / 520) * 100) + '%';
+    poi.style.left = ((poiX / 520) * 100) + '%';
     poi.style.top = p.y + 'px';
     poi.innerHTML = `
       <button class="poi-btn" type="button" aria-label="${lm.de}">${lm.icon}</button>
       <span class="poi-label">${lm.uz}</span>
-      <span class="poi-link" style="width:${off - 30}px;left:${side === 1 ? 'calc(100% - ' + (off - 30) + 'px)' : '-' + (off - 30) + 'px'}"></span>`;
+      <span class="poi-link" style="width:${off - 30}px;left:${effSide === 1 ? 'calc(100% - ' + (off - 30) + 'px)' : '-' + (off - 30) + 'px'}"></span>`;
     poi.querySelector('.poi-btn').addEventListener('click', (ev) => showPoiPop(ev, lm));
     wrap.appendChild(poi);
   }
