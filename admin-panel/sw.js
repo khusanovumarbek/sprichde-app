@@ -7,7 +7,7 @@
  * Versiyani o'zgartirish uchun CACHE_VERSION ni oshiring.
  * ============================================================ */
 
-const CACHE_VERSION = 'v25';
+const CACHE_VERSION = 'v27';
 const PRECACHE = 'sprichde-static-' + CACHE_VERSION;
 const RUNTIME = 'sprichde-runtime-' + CACHE_VERSION;
 
@@ -17,6 +17,7 @@ const ASSETS = [
   './register.html',
   './app.html',
   './journey.html',
+  './lesson.html',
   './trial.html',
   './invite.html',
   './styles.css',
