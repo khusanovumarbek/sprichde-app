@@ -55,6 +55,7 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 html[data-theme="dark"] .map-path{stroke:#20412e}
 html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
 .day-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;z-index:5}
+.lock-ic{font-size:22px;line-height:1}
 .node-circle{width:58px;height:58px;border-radius:50%;border:4px solid #ffffff;display:grid;place-items:center;font-weight:800;font-size:17px;cursor:pointer;color:#fff;transition:transform .12s;box-shadow:0 6px 14px #0000003d}
 .node-circle:active{transform:translateY(2px) scale(.96)}
 /* Bajarilgan kun — yashil tugma */
@@ -186,7 +187,7 @@ function buildNodes() {
     node.style.top = y + 'px';
     node.dataset.day = day;
     node.innerHTML = `
-      <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '<span class="node-check">✓</span>' : day}</button>
+      <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '<span class="node-check">✓</span>' : current ? day : '<span class="lock-ic">🔒</span>'}</button>
       <span class="day-label">${day}-kun</span>
       <div class="day-pop" role="tooltip">
         <b>${lesson.de}</b>
