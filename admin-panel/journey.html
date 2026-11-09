@@ -34,25 +34,34 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 .intro p{margin:6px 0 0;font-size:12.5px;color:#ffffffd9;line-height:1.6}
 .j-count{display:inline-block;margin-top:12px;background:rgba(255,255,255,.16);border-radius:12px;padding:8px 14px;font-size:13px;font-weight:800}
 
-/* ---------- XARITA ---------- */
-.map-wrap{position:relative;margin-top:6px;height:1630px}
-.map-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
-.map-path{fill:none;stroke:#cde8d4;stroke-width:30;stroke-linecap:round;stroke-dasharray:2 34}
-.map-path-bullet{fill:none;stroke:#fff;stroke-width:2.4;stroke-dasharray:1 26;stroke-linecap:round}
+/* ---------- KUNLAR XARITASI ---------- */
+.map-wrap{position:relative;margin:6px -20px 0}
+.map-svg{display:block;width:100%;height:100%}
+.map-path{fill:none;stroke:#cde8d4;stroke-width:26;stroke-linecap:round;stroke-dasharray:2 30}
 html[data-theme="dark"] .map-path{stroke:#24433a}
-html[data-theme="dark"] .map-path-bullet{stroke:#3a5f4a}
+.day-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;z-index:5}
+.node-circle{width:56px;height:56px;border-radius:50%;border:3px solid #1d9a52;background:#e7f6ec;color:#1d9a52;font-size:15px;font-weight:800;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 14px #1d2b4b26;transition:transform .12s}
+.node-circle:active{transform:scale(.92)}
+.day-node.locked .node-circle{border-color:#e9ebf2;background:var(--surface-2);color:var(--muted);cursor:not-allowed;box-shadow:none}
+.day-node.done .node-circle{border-color:#1d9a52}
+.day-node.current .node-circle{border-color:#3157a4;background:var(--soft);color:var(--blue);box-shadow:0 0 0 5px #3157a433, 0 6px 14px #1d2b4b26}
+.day-label{font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
+.day-node.current .day-label{color:var(--blue)}
+.day-node.done .day-label{color:#1d9a52}
 
-.milestone{position:absolute;transform:translate(-50%,-50%);text-align:center;z-index:5}
-.ms-btn{display:block;width:78px;height:78px;border-radius:50%;border:4px solid #1d9a52;background-color:#265331;background-size:cover;background-position:center;cursor:pointer;box-shadow:0 8px 18px #1d2b4b33, inset 0 0 0 3px rgba(255,255,255,.25);transition:transform .12s;position:relative}
-.ms-btn:active{transform:scale(.94)}
-.ms-day{margin:8px auto 0;display:inline-block;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:2px 10px;font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
-.ms-pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,8px);width:200px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 14px 34px #1d2b4b33;z-index:30;opacity:0;pointer-events:none;transition:opacity .15s, transform .15s;text-align:left}
-.ms-pop::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--surface)}
-.milestone.open .ms-pop{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.ms-pop b{display:block;font-size:14px;color:var(--blue);font-weight:800}
-.ms-pop span{display:block;font-size:11.5px;color:var(--text);margin-top:2px;font-weight:700}
-.ms-pop small{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5}
-.note{margin-top:20px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
+.day-pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,8px);width:210px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;z-index:30;box-shadow:0 14px 34px #1d2b4b33;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.day-pop::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--surface)}
+.day-node.open .day-pop{opacity:1;transform:translate(-50%,0)}
+.day-pop b{display:block;font-size:13.5px;color:var(--blue);font-weight:800}
+.day-pop span{display:block;font-size:11.5px;color:var(--text);margin-top:3px;font-weight:700}
+.day-pop small{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5}
+.day-pop .lock-note{display:block;font-size:10.5px;color:#d2453c;font-weight:800;margin-top:6px}
+.note{margin-top:16px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
+
+@media (max-width:420px){
+  .wrap{padding-left:14px;padding-right:14px}
+  .map-wrap{margin-left:-14px;margin-right:-14px}
+}
 </style>
 </head>
 <body>
@@ -65,108 +74,105 @@ html[data-theme="dark"] .map-path-bullet{stroke:#3a5f4a}
   <div class="intro">
     <small>SAYOHAT</small>
     <b>91 kunlik sayohat</b>
-    <p>Har kuni bir qadam — katta natija sari. Manzil ustiga bosing: nemischa va o‘zbekcha nomi chiqadi.</p>
+    <p>Har kuni bir qadam — katta natija sari. O‘tilgan kunlar ✓ yashil, keyingi kunlar kulrang yopiq.</p>
     <div class="j-count" id="journeyCount">0 / 91 kun</div>
   </div>
 
-  <div class="map-wrap" id="mapWrap">
-    <svg class="map-svg" viewBox="0 0 520 1630" preserveAspectRatio="none" aria-hidden="true">
-      <path class="map-path" d="M 250 40 C 430 130, 130 230, 250 330 C 380 420, 470 520, 280 610 C 110 700, 90 800, 260 890 C 430 980, 470 1100, 280 1190 C 120 1270, 120 1420, 260 1560"/>
-      <path class="map-path-bullet" d="M 250 40 C 430 130, 130 230, 250 330 C 380 420, 470 520, 280 610 C 110 700, 90 800, 260 890 C 430 980, 470 1100, 280 1190 C 120 1270, 120 1420, 260 1560"/>
-    </svg>
+  <div class="map-wrap" id="mapWrap"></div>
 
-    <div class="milestone" style="left:12%;top:56px">
-      <button class="ms-btn" type="button" aria-label="Berlin"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">1-kun</span>
-      <div class="ms-pop"><b>die Hauptstadt</b><span>— poytaxt</span><small>Berlin — Germaniyaning poytaxti</small></div>
-    </div>
-
-    <div class="milestone" style="left:76%;top:190px">
-      <button class="ms-btn" type="button" aria-label="München"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">7-kun</span>
-      <div class="ms-pop"><b>die Altstadt</b><span>— eski shahar</span><small>München — Bavariyaning poytaxti, qadimiy eski shahar</small></div>
-    </div>
-
-    <div class="milestone" style="left:26%;top:318px">
-      <button class="ms-btn" type="button" aria-label="Hamburg"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">16-kun</span>
-      <div class="ms-pop"><b>der Hafen</b><span>— port, bandargoh</span><small>Hamburg — Germaniyaning eng yirik porti</small></div>
-    </div>
-
-    <div class="milestone" style="left:70%;top:470px">
-      <button class="ms-btn" type="button" aria-label="Köln"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">28-kun</span>
-      <div class="ms-pop"><b>die Brücke</b><span>— ko‘prik</span><small>Köln — Reyn daryosi ustidagi mashhur Hohenzollernbrücke</small></div>
-    </div>
-
-    <div class="milestone" style="left:16%;top:610px">
-      <button class="ms-btn" type="button" aria-label="Heidelberg"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">39-kun</span>
-      <div class="ms-pop"><b>das Schloss</b><span>— qal‘a, saroy</span><small>Heidelberg — Neckar daryosi bo‘yidagi universitet shahri</small></div>
-    </div>
-
-    <div class="milestone" style="left:58%;top:760px">
-      <button class="ms-btn" type="button" aria-label="Frankfurt"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">52-kun</span>
-      <div class="ms-pop"><b>die Börse</b><span>— birja</span><small>Frankfurt — Germaniyaning moliya markazi</small></div>
-    </div>
-
-    <div class="milestone" style="left:76%;top:930px">
-      <button class="ms-btn" type="button" aria-label="Rothenburg"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">64-kun</span>
-      <div class="ms-pop"><b>das Rathaus</b><span>— shahar hokimiyati binosi</span><small>Rothenburg ob der Tauber — o‘rta asr qal‘a shahri</small></div>
-    </div>
-
-    <div class="milestone" style="left:20%;top:1130px">
-      <button class="ms-btn" type="button" aria-label="Zugspitze"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">76-kun</span>
-      <div class="ms-pop"><b>die Alpen</b><span>— Alplar tog‘lari</span><small>Zugspitze — Germaniyaning eng baland cho‘qqisi</small></div>
-    </div>
-
-    <div class="milestone" style="left:52%;top:1385px">
-      <button class="ms-btn" type="button" aria-label="Elbe"
-        style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.38)),url('https://images.unsplash.com/photo-1493863641943-9b68992a8d07?auto=format&fit=crop&w=240&q=70')"></button>
-      <span class="ms-day">91-kun</span>
-      <div class="ms-pop"><b>der Fluss</b><span>— daryo</span><small>Elbe — Germaniyadan oqib o‘tadigan yirik daryo</small></div>
-    </div>
-  </div>
-
-  <p class="note">Boshqalar: <b>die Brücke — ko‘prik</b>, <b>der Bahnhof — stansiya</b>, <b>das Schloss — qal‘a</b>. Keyingi bekatlar bosqichma-bosqich qo‘shiladi.</p>
+  <p class="note">O‘tilgan kunlarni qayta ko‘rish uchun ✓ belgilangan doiralarni bosing.</p>
 </div>
 
 <script>
+const TOTAL_DAYS = 91;
+const LESSONS = [
+  { de: 'Hallo', uz: 'Salom' },
+  { de: 'Wie heißt du?', uz: 'Isming nima?' },
+  { de: 'Danke', uz: 'Rahmat' },
+  { de: 'das Wasser', uz: 'suv' },
+  { de: 'Guten Morgen', uz: 'Xayrli tong' },
+  { de: 'die Familie', uz: 'oila' },
+  { de: 'gut', uz: 'yaxshi' },
+  { de: 'der Kaffee', uz: 'kofe' },
+  { de: 'die Frage', uz: 'savol' },
+  { de: 'Entschuldigung', uz: 'kechirasiz' },
+  { de: 'der Bahnhof', uz: 'stansiya / vokzal' },
+  { de: 'das Wetter', uz: 'ob-havo' },
+];
+
+const wrap = document.getElementById('mapWrap');
+const STEP = 92;
+const TOP = 30;
+const MAP_HEIGHT = TOP + TOTAL_DAYS * STEP + 40;
+wrap.style.height = MAP_HEIGHT + 'px';
+
+function nodePoint(i) {
+  const t = i / 6.4;
+  const x = 50 + Math.sin(t) * 29; // 21%..79%
+  const y = TOP + i * STEP;
+  return { x, y };
+}
+
+// SVG yo‘li
+let d = '';
+for (let i = 0; i < TOTAL_DAYS; i++) {
+  const p = nodePoint(i);
+  d += (i === 0 ? 'M' : ' L') + ` ${p.x.toFixed(2)} ${p.y.toFixed(1)}`;
+}
+const svg = `<svg class="map-svg" viewBox="0 0 100 ${MAP_HEIGHT}" preserveAspectRatio="none" aria-hidden="true"><path class="map-path" stroke-width="7" d="${d}"/></svg>`;
+wrap.innerHTML = svg;
+
+let completedDays = [];
+function buildNodes() {
+  wrap.querySelectorAll('.day-node').forEach((n) => n.remove());
+  const nextDay = completedDays.length ? Math.max(...completedDays) + 1 : 1;
+  for (let day = 1; day <= TOTAL_DAYS; day++) {
+    const { x, y } = nodePoint(day - 1);
+    const done = completedDays.includes(day);
+    const current = day === nextDay;
+    const locked = !done && !current;
+    const lesson = LESSONS[(day - 1) % LESSONS.length];
+    const node = document.createElement('div');
+    node.className = 'day-node' + (done ? ' done' : '') + (locked ? ' locked' : '') + (current ? ' current' : '');
+    node.style.left = x + '%';
+    node.style.top = y + 'px';
+    node.innerHTML = `
+      <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '✓' : day}</button>
+      <span class="day-label">${day}-kun</span>
+      <div class="day-pop" role="tooltip">
+        <b>${lesson.de}</b>
+        <span>— ${lesson.uz}</span>
+        <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
+        ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
+      </div>`;
+    const circle = node.querySelector('.node-circle');
+    circle.addEventListener('click', () => {
+      const willOpen = !node.classList.contains('open');
+      wrap.querySelectorAll('.day-node.open').forEach((n) => n.classList.remove('open'));
+      if (willOpen) node.classList.add('open');
+    });
+    wrap.appendChild(node);
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.day-node')) {
+    wrap.querySelectorAll('.day-node.open').forEach((n) => n.classList.remove('open'));
+  }
+});
+
 (async function initJourney() {
   const me = await guard('student');
   if (!me) return;
-  const TOTAL_DAYS = 91;
   try {
     const data = await authFetch('/api/progress');
-    const done = Array.isArray(data.completedDays) ? data.completedDays.length : 0;
-    document.getElementById('journeyCount').textContent = done + ' / ' + TOTAL_DAYS + ' kun';
+    completedDays = Array.isArray(data.completedDays) ? data.completedDays : [];
+    document.getElementById('journeyCount').textContent = completedDays.length + ' / ' + TOTAL_DAYS + ' kun';
   } catch {
+    completedDays = [];
     document.getElementById('journeyCount').textContent = '0 / 91 kun';
   }
-  document.querySelectorAll('.ms-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const ms = btn.closest('.milestone');
-      const willOpen = !ms.classList.contains('open');
-      document.querySelectorAll('.milestone.open').forEach((m) => m.classList.remove('open'));
-      if (willOpen) ms.classList.add('open');
-    });
-  });
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.milestone')) {
-      document.querySelectorAll('.milestone.open').forEach((m) => m.classList.remove('open'));
-    }
-  });
+  buildNodes();
 })();
 </script>
 </body>
