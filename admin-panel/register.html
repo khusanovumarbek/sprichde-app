@@ -183,7 +183,7 @@ label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--text);lett
         <label>Ism Familiya<input class="input" name="name" id="fName" placeholder="Masalan, Ali Karimov" required autocomplete="name"></label>
         <label>Telefon (ixtiyoriy)<input class="input" name="phone" id="fPhone" type="tel" placeholder="+998 90 123 45 67" autocomplete="tel"></label>
       </div>
-      <label>Email<input class="input" name="email" id="fEmail" type="email" placeholder="siz@example.com" required autocomplete="email"></label>
+      <label>Email (ixtiyoriy)<input class="input" name="email" id="fEmail" type="email" placeholder="siz@example.com" autocomplete="email"></label>
       <div class="row">
         <label>Daraja
           <select class="input" name="level" id="fLevel" required>
@@ -262,7 +262,7 @@ label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--text);lett
 
     if (name.length < 3) return setError(form.fName, 'Ism kamida 3 belgidan iborat bo‘lsin.');
     if (phone && !/^\+?\d{9,13}$/.test(phone)) return setError(form.fPhone, 'Telefon raqami noto‘g‘ri (masalan, +998901234567).');
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return setError(form.fEmail, 'Email manzili noto‘g‘ri.');
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return setError(form.fEmail, 'Email manzili noto‘g‘ri.');
     if (password.length < 6) return setError(form.fPassword, 'Parol kamida 6 belgidan iborat bo‘lsin.');
 
     submitBtn.disabled = true;

@@ -128,6 +128,12 @@ def init_db() -> None:
         # Yangi ustunlar (eski bazalar uchun migratsiya)
         ensure_column(conn, "students", "premium_until", "TEXT DEFAULT ''")
         ensure_column(conn, "students", "plain_password", "TEXT DEFAULT ''")
+        ensure_column(conn, "students", "phone_digits", "TEXT DEFAULT ''")
+        # Eski telefonlarni raqamli formatga to'ldiramiz (telefon orqali kirish uchun)
+        for row in conn.execute("SELECT id, phone FROM students").fetchall():
+            digits = re.sub(r"\D", "", row["phone"] or "")
+            if digits:
+                conn.execute("UPDATE students SET phone_digits = ? WHERE id = ? AND (phone_digits IS NULL OR phone_digits = '')", (digits, row["id"]))
 
         conn.execute(
             """
@@ -188,8 +194,8 @@ def init_db() -> None:
                 salt = secrets.token_hex(8)
                 conn.execute(
                     "INSERT INTO students (full_name, email, password_salt, password_hash,"
-                    " level, phone, status, created_at, premium_until, plain_password) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                    (name, email, salt, hash_password("demo1234", salt), level, phone, "active", now, default_until, "demo1234"),
+                    " level, phone, status, created_at, premium_until, plain_password, phone_digits) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                    (name, email, salt, hash_password("demo1234", salt), level, phone, "active", now, default_until, "demo1234", re.sub(r"\D", "", phone)),
                 )
 
         # Premium muddati kiritilmagan o'quvchilarga 91 kunlik boshlang'ich muddat
@@ -244,10 +250,13 @@ def payment_public(row: sqlite3.Row) -> dict:
 
 def student_public(row: sqlite3.Row, payment: sqlite3.Row | None = None) -> dict:
     """Parol maydonlarini tashqariga chiqarmaydi."""
+    email = row["email"] or ""
+    if email.endswith("@noemail.local"):
+        email = ""
     return {
         "id": row["id"],
         "fullName": row["full_name"],
-        "email": row["email"],
+        "email": email,
         "level": row["level"],
         "phone": row["phone"],
         "status": row["status"],
@@ -434,16 +443,24 @@ class Handler(SimpleHTTPRequestHandler):
         data = self.read_json()
         email = str(data.get("email") or "").strip().lower()
         password = str(data.get("password") or "")
-        if not EMAIL_RE.match(email) or not password:
+        if not password:
             return self.send_json(
-                {"error": "Email va parolni kiriting."}, HTTPStatus.BAD_REQUEST
+                {"error": "Email yoki telefon va parolni kiriting."}, HTTPStatus.BAD_REQUEST
             )
 
         with db() as conn:
             if role == "admin":
+                if not EMAIL_RE.match(email):
+                    return self.send_json(
+                        {"error": "Email va parolni kiriting."}, HTTPStatus.BAD_REQUEST
+                    )
                 row = conn.execute("SELECT * FROM admins WHERE email = ?", (email,)).fetchone()
-            else:
+            elif EMAIL_RE.match(email):
                 row = conn.execute("SELECT * FROM students WHERE email = ?", (email,)).fetchone()
+            else:
+                # Telefon orqali kirish: faqat raqamlar bo'yicha qidiramiz
+                digits = re.sub(r"\D", "", email)
+                row = conn.execute("SELECT * FROM students WHERE phone_digits = ?", (digits,)).fetchone() if digits else None
 
         # Email mavjudligini oshkor qilmaymiz
         if row is None or not verify_password(password, row["password_salt"], row["password_hash"]):
@@ -570,9 +587,9 @@ class Handler(SimpleHTTPRequestHandler):
             with db() as conn:
                 cur = conn.execute(
                     "INSERT INTO students (full_name, email, password_salt, password_hash,"
-                    " level, phone, status, created_at, premium_until, plain_password)"
-                    " VALUES (?,?,?,?,?,?,?,?,?,?)",
-                    (name, email, salt, hash_password(password, salt), level, phone, "active", now, premium_until, password),
+                    " level, phone, status, created_at, premium_until, plain_password, phone_digits)"
+                    " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                    (name, email, salt, hash_password(password, salt), level, phone, "active", now, premium_until, password, re.sub(r"\D", "", phone)),
                 )
                 new_id = cur.lastrowid
         except sqlite3.IntegrityError:
@@ -629,8 +646,8 @@ class Handler(SimpleHTTPRequestHandler):
                     {"error": "Ism-familiyani to‘liq kiriting."}, HTTPStatus.BAD_REQUEST
                 )
             conn.execute(
-                "UPDATE students SET full_name = ?, phone = ? WHERE id = ?",
-                (name, phone, row["id"]),
+                "UPDATE students SET full_name = ?, phone = ?, phone_digits = ? WHERE id = ?",
+                (name, phone, re.sub(r"\D", "", phone), row["id"]),
             )
             row = conn.execute("SELECT * FROM students WHERE id = ?", (row["id"],)).fetchone()
         self.send_json({"ok": True, "profile": student_public(row)})
@@ -924,11 +941,12 @@ class Handler(SimpleHTTPRequestHandler):
         password = str(data.get("password") or "")
         level = str(data.get("level") or "Anfänger").strip()
         phone = str(data.get("phone") or "").strip()
+        phone_digits = re.sub(r"\D", "", phone)
 
         error = None
         if len(name) < 2:
             error = "Ism-familiyani to‘liq kiriting."
-        elif not EMAIL_RE.match(email):
+        elif email and not EMAIL_RE.match(email):
             error = "Email manzil noto‘g‘ri."
         elif len(password) < 6:
             error = "Parol kamida 6 belgidan iborat bo‘lishi kerak."
@@ -936,6 +954,14 @@ class Handler(SimpleHTTPRequestHandler):
             error = "Daraja noto‘g‘ri tanlangan."
         if error:
             return self.send_json({"error": error}, HTTPStatus.BAD_REQUEST)
+
+        # Email ixtiyoriy: bo'sh qoldirilsa, noyob placeholder ishlatamiz
+        # (bazadagi NOT NULL + UNIQUE cheklovlarga mos keladi)
+        if not email:
+            email = f"noemail-{secrets.token_hex(8)}@noemail.local"
+        else:
+            # real email, telefon orqali kirish imkoniyatini ham beramiz
+            pass
 
         salt = secrets.token_hex(8)
         now = datetime.now(timezone.utc).isoformat()
@@ -946,9 +972,9 @@ class Handler(SimpleHTTPRequestHandler):
             with db() as conn:
                 cur = conn.execute(
                     "INSERT INTO students (full_name, email, password_salt, password_hash,"
-                    " level, phone, status, created_at, premium_until, plain_password)"
-                    " VALUES (?,?,?,?,?,?,?,?,?,?)",
-                    (name, email, salt, hash_password(password, salt), level, phone, "active", now, premium_until, password),
+                    " level, phone, status, created_at, premium_until, plain_password, phone_digits)"
+                    " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                    (name, email, salt, hash_password(password, salt), level, phone, "active", now, premium_until, password, re.sub(r"\D", "", phone)),
                 )
                 new_id = cur.lastrowid
         except sqlite3.IntegrityError:
