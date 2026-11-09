@@ -49,8 +49,8 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 
 /* ---------- KUNLAR XARITASI ---------- */
 .map-wrap{position:relative;margin:16px -20px 0}
-.map-svg{display:block;width:100%}
-.map-path{fill:none;stroke:var(--green-soft);stroke-width:24;stroke-linecap:round;stroke-dasharray:2 34}
+.map-svg{display:block;width:100%;height:100%}
+.map-path{fill:none;stroke:var(--green-soft);stroke-width:32;stroke-linecap:round;stroke-dasharray:2 30}
 .map-path-dots{fill:none;stroke:#ffffff;stroke-width:5;stroke-linecap:round;stroke-dasharray:0.1 26}
 html[data-theme="dark"] .map-path{stroke:#20412e}
 html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
@@ -144,19 +144,21 @@ const MAP_HEIGHT = TOP + TOTAL_DAYS * STEP + 60;
 wrap.style.height = MAP_HEIGHT + 'px';
 
 function nodePoint(i) {
+  // 520px koordinata maydoni: yo‘l doimiy kengligi saqlanadi
   const t = i / 6.2;
-  const x = 50 + Math.sin(t) * 29; // 21%..79%
+  const xPx = 260 + Math.sin(t) * 175; // px
+  const xPct = (xPx / 520) * 100;
   const y = TOP + i * STEP;
-  return { x, y };
+  return { x: xPct, xPx, y };
 }
 
 // SVG yo‘li: qalin yumshoq yashil chiziq + kichik nuqta-chiziq
 let d = '';
 for (let i = 0; i < TOTAL_DAYS; i++) {
   const p = nodePoint(i);
-  d += (i === 0 ? 'M' : ' L') + ` ${p.x.toFixed(2)} ${p.y.toFixed(1)}`;
+  d += (i === 0 ? 'M' : ' L') + ` ${p.xPx.toFixed(1)} ${p.y.toFixed(1)}`;
 }
-wrap.innerHTML = `<svg class="map-svg" viewBox="0 0 100 ${MAP_HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
+wrap.innerHTML = `<svg class="map-svg" viewBox="0 0 520 ${MAP_HEIGHT}" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
   <path class="map-path" d="${d}"/>
   <path class="map-path-dots" d="${d}"/>
 </svg>`;
