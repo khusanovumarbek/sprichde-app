@@ -21,53 +21,69 @@
 <script src="pwa.js" defer></script>
 <link rel="stylesheet" href="theme.css">
 <style>
-:root{font-family:Inter,"Segoe UI",Arial,sans-serif;--blue:var(--primary);--blue-dark:var(--primary-2);--muted:#788196;--line:#e9ebf2;--soft:#e7efff;--shadow:0 10px 26px #1d2b4b0f}
+:root{font-family:Inter,"Segoe UI",Arial,sans-serif;--blue:var(--primary);--blue-dark:var(--primary-2);--muted:#788196;--line:#e9ebf2;--soft:#e7efff;--shadow:0 10px 26px #1d2b4b0f;--green:#25a368;--green-dark:#1d8a54;--green-soft:#cde8d4}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 .topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:20}
 .back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px;text-decoration:none;color:var(--text)}
 .topbar b{font-size:16px;font-weight:800}
-.wrap{max-width:520px;margin:0 auto;padding:22px 20px 70px}
-.intro{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
-.intro small{font-size:10.5px;font-weight:800;letter-spacing:2px;color:#ffffffcc}
-.intro b{display:block;font-size:22px;font-weight:800;margin-top:6px}
-.intro p{margin:6px 0 0;font-size:12.5px;color:#ffffffd9;line-height:1.6}
-.j-count{display:inline-block;margin-top:12px;background:rgba(255,255,255,.16);border-radius:12px;padding:8px 14px;font-size:13px;font-weight:800}
+.wrap{max-width:520px;margin:0 auto;padding:18px 20px 80px}
+
+/* ---------- PROGRESS KARTA ---------- */
+.intro{position:relative;background:linear-gradient(150deg,#243f7a 0%,#2c4e94 55%,#33589f 100%);border-radius:22px;padding:22px 20px 18px;color:#fff;box-shadow:var(--shadow);overflow:hidden}
+.intro::after{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;background:#3157a422}
+.intro small{display:block;font-size:10.5px;font-weight:800;letter-spacing:2.5px;color:#ffffffcc;position:relative}
+.intro b{display:block;font-size:23px;font-weight:800;margin-top:4px;position:relative}
+.intro-grid{display:flex;align-items:center;gap:16px;margin-top:14px;position:relative}
+.ring-wrap{position:relative;flex:none;width:84px;height:84px}
+.ring-bg{stroke:#ffffff2e}
+.ring-fg{stroke:#ffd23e;transition:stroke-dashoffset .5s ease;transform:rotate(-90deg);transform-origin:50% 50%}
+.ring-label{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring-label b{display:block;font-size:19px;font-weight:800;line-height:1}
+.ring-label small{font-size:9px;font-weight:700;letter-spacing:.4px;color:#ffffffcc;margin-top:2px}
+.intro-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1}
+.stat-box{background:rgba(255,255,255,.12);border-radius:14px;padding:10px 12px}
+.stat-box small{font-size:10px;font-weight:700;letter-spacing:.4px;color:#ffffffaa}
+.stat-box b{display:block;font-size:16px;font-weight:800;margin-top:2px}
+.stat-box span{font-size:11px;color:#ffffffaa}
 
 /* ---------- KUNLAR XARITASI ---------- */
-.map-wrap{position:relative;margin:6px -20px 0}
-.map-svg{display:block;width:100%;height:100%}
-.map-path{fill:none;stroke:#cde8d4;stroke-width:26;stroke-linecap:round;stroke-dasharray:2 30}
-html[data-theme="dark"] .map-path{stroke:#24433a}
-.day-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;z-index:5}
-.node-circle{width:56px;height:56px;border-radius:50%;border:3px solid #1d9a52;background:#e7f6ec;color:#1d9a52;font-size:15px;font-weight:800;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 14px #1d2b4b26;transition:transform .12s}
-.node-circle:active{transform:scale(.92)}
-.day-node.locked .node-circle{border-color:#e9ebf2;background:var(--surface-2);color:var(--muted);cursor:not-allowed;box-shadow:none}
-.day-node.done .node-circle{border-color:#1d9a52}
-.day-node.current .node-circle{border-color:#3157a4;background:var(--soft);color:var(--blue);box-shadow:0 0 0 5px #3157a433, 0 6px 14px #1d2b4b26}
+.map-wrap{position:relative;margin:16px -20px 0}
+.map-svg{display:block;width:100%}
+.map-path{fill:none;stroke:var(--green-soft);stroke-width:24;stroke-linecap:round;stroke-dasharray:2 34}
+.map-path-dots{fill:none;stroke:#ffffff;stroke-width:5;stroke-linecap:round;stroke-dasharray:0.1 26}
+html[data-theme="dark"] .map-path{stroke:#20412e}
+html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
+.day-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;z-index:5}
+.node-circle{width:58px;height:58px;border-radius:50%;border:4px solid #ffffff;background:linear-gradient(180deg,#41c375 0%,#28a361 60%,#1d8a54 100%);color:#fff;font-size:16px;font-weight:800;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 0 #14663c, 0 12px 18px #14663c44;transition:transform .12s}
+.node-circle:active{transform:translateY(2px) scale(.96)}
+.day-node.locked .node-circle{background:var(--surface-2);border-color:#ffffff;box-shadow:none;color:var(--muted);cursor:not-allowed;font-size:15px}
+.day-node.current .node-circle{background:linear-gradient(180deg,#3a6ad0 0%,#3157a4 100%);box-shadow:0 6px 0 #24417f, 0 0 0 6px #3157a433, 0 12px 18px #1d2b4b44;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 6px 0 #24417f, 0 0 0 5px #3157a433, 0 12px 18px #1d2b4b44}50%{box-shadow:0 6px 0 #24417f, 0 0 0 10px #3157a422, 0 12px 18px #1d2b4b44}}
 .day-label{font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
+.day-node.done .day-label{color:var(--green-dark)}
 .day-node.current .day-label{color:var(--blue)}
-.day-node.done .day-label{color:#1d9a52}
+.check{font-size:20px;line-height:1}
 
-.day-pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,8px);width:210px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;z-index:30;box-shadow:0 14px 34px #1d2b4b33;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
-.day-pop::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--surface)}
+.day-pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,8px);width:200px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 11px;z-index:30;box-shadow:0 14px 34px #1d2b4b33;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.day-pop::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--surface)}
 .day-node.open .day-pop{opacity:1;transform:translate(-50%,0)}
-.day-pop b{display:block;font-size:13.5px;color:var(--blue);font-weight:800}
-.day-pop span{display:block;font-size:11.5px;color:var(--text);margin-top:3px;font-weight:700}
-.day-pop small{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5}
-.day-pop .lock-note{display:block;font-size:10.5px;color:#d2453c;font-weight:800;margin-top:6px}
+.day-pop b{display:block;font-size:13px;color:var(--blue);font-weight:800}
+.day-pop span{display:block;font-size:11px;color:var(--text);margin-top:3px;font-weight:700}
+.day-pop small{display:block;font-size:9.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.day-pop .lock-note{display:block;font-size:10.5px;color:#d2453c;font-weight:800;margin-top:5px}
 
-/* ---------- Manzara bekatlari ---------- */
-.day-node.landmark .node-circle{width:94px;height:94px;border-width:4px}
-.day-node.landmark.current .node-circle{box-shadow:0 0 0 5px #3157a433, 0 8px 20px #1d2b4b33}
-.day-node.landmark .photo{position:absolute;inset:0;border-radius:50%;background-size:cover;background-position:center}
-.day-node.locked .photo{filter:grayscale(.9) brightness(.75)}
-.note{margin-top:16px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
-.note{margin-top:16px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
+/* ---------- BUGUNGA QAYTISH ---------- */
+.today-btn{position:sticky;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:9px;height:46px;padding:0 22px;border:0;border-radius:24px;background:#3157a4;color:#fff;font:inherit;font-size:13px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 8px 24px #3157a455;z-index:15;margin-top:-56px}
+.today-btn:active{transform:translateX(-50%) scale(.96)}
+.today-btn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.2}
 
 @media (max-width:420px){
   .wrap{padding-left:14px;padding-right:14px}
   .map-wrap{margin-left:-14px;margin-right:-14px}
+  .intro b{font-size:20px}
+  .intro-grid{gap:12px}
+  .ring-wrap{width:74px;height:74px}
 }
 </style>
 </head>
@@ -81,28 +97,30 @@ html[data-theme="dark"] .map-path{stroke:#24433a}
   <div class="intro">
     <small>SAYOHAT</small>
     <b>91 kunlik sayohat</b>
-    <p>Har kuni bir qadam — katta natija sari. O‘tilgan kunlar ✓ yashil, keyingi kunlar kulrang yopiq.</p>
-    <div class="j-count" id="journeyCount">0 / 91 kun</div>
+    <div class="intro-grid">
+      <div class="ring-wrap" aria-hidden="true">
+        <svg viewBox="0 0 84 84" width="84" height="84">
+          <circle class="ring-bg" cx="42" cy="42" r="34" fill="none" stroke-width="7"/>
+          <circle class="ring-fg" id="ringFg" cx="42" cy="42" r="34" fill="none" stroke-width="7" stroke-linecap="round" stroke-dasharray="213.63" stroke-dashoffset="213.63"/>
+        </svg>
+        <div class="ring-label"><b id="ringPct">0%</b><small>O‘tilgan</small></div>
+      </div>
+      <div class="intro-stats">
+        <div class="stat-box"><small>Hozir</small><b id="currentDay">1-kun</b><span>Navbatdagi dars</span></div>
+        <div class="stat-box"><small>O‘tilgan</small><b id="doneCount">0</b><span>91 kundan</span></div>
+      </div>
+    </div>
+    <button class="today-btn" id="goTodayBtn" type="button">
+      <svg viewBox="0 0 24 24"><path d="M12 8v8M8 12h8" /><circle cx="12" cy="12" r="9"/></svg>
+      Bugunga qaytish
+    </button>
   </div>
 
   <div class="map-wrap" id="mapWrap"></div>
-
-  <p class="note">O‘tilgan kunlarni qayta ko‘rish uchun ✓ belgilangan doiralarni bosing.</p>
 </div>
 
 <script>
 const TOTAL_DAYS = 91;
-/* Manzara bekatlari: shu kunlarda katta rasm tugmasi */
-const LANDMARKS = {
-  1:  { img: '1533929736458-ca588d08c8be', de: 'die Hauptstadt', uz: 'poytaxt', cap: 'Berlin — Germaniyaning poytaxti' },
-  7:  { img: '1467269204594-9661b134dd2b', de: 'die Altstadt', uz: 'eski shahar', cap: 'München — qadimiy eski shahar' },
-  16: { img: '1516483638261-f4dbaf036963', de: 'der Hafen', uz: 'port, bandargoh', cap: 'Hamburg — yirik port shahar' },
-  28: { img: '1464822759023-fed622ff2c3b', de: 'die Alpen', uz: 'Alplar tog‘lari', cap: 'Zugspitze — Germaniyaning eng baland cho‘qqisi' },
-  45: { img: '1548883354-7622d03aca27', de: 'die Hose', uz: 'shim', cap: 'Gap: „Ich trage eine Hose“ — Men shim kiyapman' },
-  64: { img: '1493863641943-9b68992a8d07', de: 'die Stadt', uz: 'shahar', cap: 'Rothenburg ob der Tauber — o‘rta asr qal‘a shahri' },
-  79: { img: '1520763185298-1b434c919102', de: 'die Tulpe', uz: 'lola', cap: 'Hollandiyadagi lola — Germaniyada ham mashhur gul' },
-  91: { img: '1524661135-423995f22d0b', de: 'der Fluss', uz: 'daryo', cap: 'Elbe — Germaniyadagi yirik daryo' },
-};
 const LESSONS = [
   { de: 'Hallo', uz: 'Salom' },
   { de: 'Wie heißt du?', uz: 'Isming nima?' },
@@ -119,67 +137,54 @@ const LESSONS = [
 ];
 
 const wrap = document.getElementById('mapWrap');
-const STEP = 92;
+const STEP = 104;
 const TOP = 30;
-const MAP_HEIGHT = TOP + TOTAL_DAYS * STEP + 40;
+const MAP_HEIGHT = TOP + TOTAL_DAYS * STEP + 60;
 wrap.style.height = MAP_HEIGHT + 'px';
 
 function nodePoint(i) {
-  const t = i / 6.4;
+  const t = i / 6.2;
   const x = 50 + Math.sin(t) * 29; // 21%..79%
   const y = TOP + i * STEP;
   return { x, y };
 }
 
-// SVG yo‘li
+// SVG yo‘li: qalin yumshoq yashil chiziq + kichik nuqta-chiziq
 let d = '';
 for (let i = 0; i < TOTAL_DAYS; i++) {
   const p = nodePoint(i);
   d += (i === 0 ? 'M' : ' L') + ` ${p.x.toFixed(2)} ${p.y.toFixed(1)}`;
 }
-const svg = `<svg class="map-svg" viewBox="0 0 100 ${MAP_HEIGHT}" preserveAspectRatio="none" aria-hidden="true"><path class="map-path" stroke-width="7" d="${d}"/></svg>`;
-wrap.innerHTML = svg;
+wrap.innerHTML = `<svg class="map-svg" viewBox="0 0 100 ${MAP_HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
+  <path class="map-path" d="${d}"/>
+  <path class="map-path-dots" d="${d}"/>
+</svg>`;
 
 let completedDays = [];
+let currentDayNumber = 1;
+
 function buildNodes() {
   wrap.querySelectorAll('.day-node').forEach((n) => n.remove());
-  const nextDay = completedDays.length ? Math.max(...completedDays) + 1 : 1;
   for (let day = 1; day <= TOTAL_DAYS; day++) {
     const { x, y } = nodePoint(day - 1);
     const done = completedDays.includes(day);
-    const current = day === nextDay;
+    const current = day === currentDayNumber;
     const locked = !done && !current;
     const lesson = LESSONS[(day - 1) % LESSONS.length];
-    const lm = LANDMARKS[day];
     const node = document.createElement('div');
-    node.className = 'day-node' + (done ? ' done' : '') + (locked ? ' locked' : '') + (current ? ' current' : '') + (lm ? ' landmark' : '');
+    node.className = 'day-node' + (done ? ' done' : '') + (locked ? ' locked' : '') + (current ? ' current' : '');
     node.style.left = x + '%';
     node.style.top = y + 'px';
-    if (lm) {
-      // Manzara bekat: katta rasm tugma, popover ichida so'z va izoh
-      node.innerHTML = `
-        <button class="node-circle" type="button" aria-label="${day}-kun">
-          <span class="photo" style="background-image:linear-gradient(rgba(0,0,0,.10),rgba(0,0,0,.35)),url('https://images.unsplash.com/photo-${lm.img}?auto=format&fit=crop&w=240&q=70')"></span>
-        </button>
-        <span class="day-label">${day}-kun</span>
-        <div class="day-pop" role="tooltip">
-          <b>${lm.de}</b>
-          <span>— ${lm.uz}</span>
-          <small>${lm.cap}</small>
-          <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
-          ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
-        </div>`;
-    } else {
-      node.innerHTML = `
-        <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '✓' : day}</button>
-        <span class="day-label">${day}-kun</span>
-        <div class="day-pop" role="tooltip">
-          <b>${lesson.de}</b>
-          <span>— ${lesson.uz}</span>
-          <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
-          ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
-        </div>`;
-    }
+    node.dataset.day = day;
+    node.innerHTML = `
+      <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '<span class="check">✓</span>' : day}</button>
+      <span class="day-label">${day}-kun</span>
+      <div class="day-pop" role="tooltip">
+        <b>${lesson.de}</b>
+        <span>— ${lesson.uz}</span>
+        <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
+        ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
+      </div>`;
     const circle = node.querySelector('.node-circle');
     circle.addEventListener('click', () => {
       const willOpen = !node.classList.contains('open');
@@ -196,18 +201,36 @@ document.addEventListener('click', (e) => {
   }
 });
 
+function paintProgress() {
+  const done = completedDays.length;
+  const pct = Math.round((done / TOTAL_DAYS) * 100);
+  const CIRC = 2 * Math.PI * 34; // ~213.63
+  document.getElementById('ringFg').style.strokeDashoffset = String(CIRC * (1 - done / TOTAL_DAYS));
+  document.getElementById('ringPct').textContent = pct + '%';
+  document.getElementById('currentDay').textContent = Math.min(TOTAL_DAYS, Math.max(1, (completedDays.length ? Math.max(...completedDays) + 1 : 1))) + '-kun';
+  document.getElementById('doneCount').textContent = done;
+}
+
+document.getElementById('goTodayBtn').addEventListener('click', () => {
+  const node = wrap.querySelector(`.day-node[data-day="${currentDayNumber}"]`);
+  if (node) node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
 (async function initJourney() {
   const me = await guard('student');
   if (!me) return;
   try {
     const data = await authFetch('/api/progress');
     completedDays = Array.isArray(data.completedDays) ? data.completedDays : [];
-    document.getElementById('journeyCount').textContent = completedDays.length + ' / ' + TOTAL_DAYS + ' kun';
-  } catch {
-    completedDays = [];
-    document.getElementById('journeyCount').textContent = '0 / 91 kun';
-  }
+  } catch { completedDays = []; }
+  currentDayNumber = completedDays.length ? Math.min(TOTAL_DAYS, Math.max(...completedDays) + 1) : 1;
+  paintProgress();
   buildNodes();
+  // Hozirgi kunga avtomatik aylantiramiz
+  setTimeout(() => {
+    const node = wrap.querySelector(`.day-node[data-day="${currentDayNumber}"]`);
+    if (node) node.scrollIntoView({ block: 'center' });
+  }, 120);
 })();
 </script>
 </body>
