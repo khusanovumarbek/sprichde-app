@@ -56,7 +56,12 @@ html[data-theme="dark"] .map-path{stroke:#20412e}
 html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
 /* Manzara bekatlari (maktab, bekat, bino, ...) — katta rasmli doiralar */
 .day-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;z-index:5}
-.day-node.landmark .node-circle{width:88px;height:88px;font-size:36px}
+.poi{position:absolute;transform:translate(-50%,-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:3px}
+.poi-btn{width:66px;height:66px;border-radius:50%;border:3px solid #ffffff;background:var(--surface-2);box-shadow:0 5px 12px #0000002e;display:grid;place-items:center;font-size:30px;cursor:pointer;transition:transform .12s}
+.poi-btn:active{transform:scale(.94)}
+.poi-label{font-size:10px;font-weight:800;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1px 7px;white-space:nowrap;box-shadow:0 2px 6px #00000018}
+.poi-link{position:absolute;top:0;height:4px;border-top:3px dashed #bcdcc4}
+html[data-theme="dark"] .poi-link{border-top-color:#2d5a3d}
 .lock-ic{font-size:22px;line-height:1}
 .node-circle{width:58px;height:58px;border-radius:50%;border:4px solid #ffffff;display:grid;place-items:center;font-weight:800;font-size:17px;cursor:pointer;color:#fff;transition:transform .12s;box-shadow:0 6px 14px #0000003d}
 .node-circle:active{transform:translateY(2px) scale(.96)}
@@ -74,6 +79,8 @@ html[data-theme="dark"] .map-path-dots{stroke:#2d5a3d}
 .day-node.locked .day-label{color:#8a95ad}
 .check{font-size:20px;line-height:1}
 
+.poi-pop{position:fixed;z-index:100;width:200px;opacity:1;pointer-events:auto;transform:none}
+.poi-pop[hidden]{display:none}
 .day-pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,8px);width:200px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 11px;z-index:30;box-shadow:0 14px 34px #1d2b4b33;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
 .day-pop::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--surface)}
 .day-node.open .day-pop{opacity:1;transform:translate(-50%,0)}
@@ -193,6 +200,49 @@ wrap.innerHTML = `<svg class="map-svg" viewBox="0 0 520 ${MAP_HEIGHT}" preserveA
 let completedDays = [];
 let currentDayNumber = 1;
 
+// Bitta umumiy popover — bekat rasmiga bosilganda joyida chiqadi
+const poiPop = document.createElement('div');
+poiPop.className = 'day-pop poi-pop';
+poiPop.setAttribute('role', 'tooltip');
+poiPop.hidden = true;
+poiPop.innerHTML = '<b></b><span></span><small></small>';
+document.body.appendChild(poiPop);
+
+function showPoiPop(ev, lm) {
+  poiPop.querySelector('b').textContent = lm.de;
+  poiPop.querySelector('span').textContent = '— ' + lm.uz;
+  poiPop.querySelector('small').textContent = lm.cap;
+  poiPop.hidden = false;
+  const rect = ev.currentTarget.getBoundingClientRect();
+  poiPop.style.left = rect.left + 'px';
+  poiPop.style.top = (rect.top - 12) + 'px';
+  poiPop.style.transform = 'translate(-50%,-100%)';
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.poi-btn') && !e.target.closest('.poi-pop')) poiPop.hidden = true;
+});
+
+function renderPOIs() {
+  wrap.querySelectorAll('.poi').forEach((p) => p.remove());
+  for (const [dayStr, lm] of Object.entries(LANDMARKS)) {
+    const day = Number(dayStr);
+    const p = nodePoint(day - 1);
+    // Yo‘l qaysi tomonga kavislanagan bo'lsa, bekatni qarshisiga qo'yamiz
+    const side = p.xPx < 260 ? 1 : -1;
+    const off = 120;
+    const poi = document.createElement('div');
+    poi.className = 'poi';
+    poi.style.left = (((p.xPx + side * off) / 520) * 100) + '%';
+    poi.style.top = p.y + 'px';
+    poi.innerHTML = `
+      <button class="poi-btn" type="button" aria-label="${lm.de}">${lm.icon}</button>
+      <span class="poi-label">${lm.uz}</span>
+      <span class="poi-link" style="width:${off - 30}px;left:${side === 1 ? 'calc(100% - ' + (off - 30) + 'px)' : '-' + (off - 30) + 'px'}"></span>`;
+    poi.querySelector('.poi-btn').addEventListener('click', (ev) => showPoiPop(ev, lm));
+    wrap.appendChild(poi);
+  }
+}
+
 function buildNodes() {
   wrap.querySelectorAll('.day-node').forEach((n) => n.remove());
   for (let day = 1; day <= TOTAL_DAYS; day++) {
@@ -201,17 +251,18 @@ function buildNodes() {
     const current = day === currentDayNumber && !done;
     const locked = !done && !current;
     const lesson = LESSONS[(day - 1) % LESSONS.length];
-    const lm = LANDMARKS[day];
     const node = document.createElement('div');
-    node.className = 'day-node' + (done ? ' done' : '') + (locked ? ' locked' : '') + (current ? ' current' : '') + (lm ? ' landmark' : '');
+    node.className = 'day-node' + (done ? ' done' : '') + (locked ? ' locked' : '') + (current ? ' current' : '');
     node.style.left = x + '%';
     node.style.top = y + 'px';
     node.dataset.day = day;
     node.innerHTML = `
-      <button class="node-circle" type="button" aria-label="${day}-kun">${lm ? lm.icon : done ? '<span class="node-check">✓</span>' : current ? day : '<span class="lock-ic">🔒</span>'}</button>
+      <button class="node-circle" type="button" aria-label="${day}-kun">${done ? '<span class="node-check">✓</span>' : current ? day : '<span class="lock-ic">🔒</span>'}</button>
       <span class="day-label">${day}-kun</span>
       <div class="day-pop" role="tooltip">
-        ${lm ? `<b>${lm.de}</b><span>— ${lm.uz}</span><small>${lm.cap}</small>` : `<b>${lesson.de}</b><span>— ${lesson.uz}</span><small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>`}
+        <b>${lesson.de}</b>
+        <span>— ${lesson.uz}</span>
+        <small>${day}-kun${done ? ' · O‘tilgan ✓' : current ? ' · Navbatdagi dars' : ' · Hali ochilmagan'}</small>
         ${locked ? '<span class="lock-note">Hali ochilmagan</span>' : ''}
       </div>`;
     const circle = node.querySelector('.node-circle');
@@ -227,6 +278,7 @@ function buildNodes() {
     });
     wrap.appendChild(node);
   }
+  renderPOIs();
 }
 
 document.addEventListener('click', (e) => {
