@@ -115,15 +115,15 @@ function overview() {
       </div>
       <span class="tag">${esc(levelLabel(x.level))}</span>
       <span class="tag ${x.status === 'Qoralama' ? 'draft' : 'ok'}">${esc(x.status)}</span>
-      <button class="row-action" data-delete="${i}" aria-label="Darsni o‘chirish">🗑</button>
+      <button class="row-action" data-delete="${i}" aria-label="Darsni o‘chirish"><svg class="icon" width="19" height="19" style="color:#d2453c"><use href="icons.svg#i-trash"/></svg></button>
     </div>`).join('') || '<div class="empty">Hali dars qo‘shilmagan.</div>';
 
   return `
-    ${heading('BOSHQARUV PANELI', 'Xush kelibsiz, Admin 👋', 'Nemis tili kurslaringiz va o‘quv kontentingiz holati.', addButton('Yangi dars'))}
+    ${heading('BOSHQARUV PANELI', 'Xush kelibsiz, Admin', 'Nemis tili kurslaringiz va o‘quv kontentingiz holati.', addButton('Yangi dars'))}
     <section class="stats">
-      ${stat('Jami darslar', String(lessons.length).padStart(2, '0'), '📚', '<span class="up">+2</span> shu oy qo‘shildi')}
-      ${stat('To‘lov qilganlar', '<span id="statPaid">—</span>', '💳', '<span class="up" id="statPaidFoot">Yuklanmoqda…</span>')}
-      ${stat('Faol o‘quvchilar', '<span id="statStudents">—</span>', '👥', '<span class="up" id="statNew">+ 0</span> yangi shu hafta')}
+      ${stat('Jami darslar', String(lessons.length).padStart(2, '0'), '<svg class="icon" width="19" height="19"><use href="icons.svg#i-book-fill"/></svg>', '<span class="up">+2</span> shu oy qo‘shildi')}
+      ${stat('To‘lov qilganlar', '<span id="statPaid">—</span>', '<svg class="icon" width="19" height="19"><use href="icons.svg#i-dollar"/></svg>', '<span class="up" id="statPaidFoot">Yuklanmoqda…</span>')}
+      ${stat('Faol o‘quvchilar', '<span id="statStudents">—</span>', '<svg class="icon" width="19" height="19"><use href="icons.svg#i-users"/></svg>', '<span class="up" id="statNew">+ 0</span> yangi shu hafta')}
       ${stat('Kutilayotgan to‘lovlar', '<span id="statPending">—</span>', '⏳', 'Admin tasdig‘ini kutmoqda')}
     </section>
     <section class="grid">
@@ -148,7 +148,7 @@ function tableRows(items) {
       <td><span class="tag">${esc(levelLabel(x.level))}</span></td>
       <td>${esc(x.duration)} daqiqa</td>
       <td><span class="tag ${x.status === 'Qoralama' ? 'draft' : 'ok'}">${esc(x.status)}</span></td>
-      <td><button class="row-action" data-delete="${x.originalIndex ?? i}" aria-label="Darsni o‘chirish">🗑</button></td>
+      <td><button class="row-action" data-delete="${x.originalIndex ?? i}" aria-label="Darsni o‘chirish"><svg class="icon" width="19" height="19" style="color:#d2453c"><use href="icons.svg#i-trash"/></svg></button></td>
     </tr>`).join('') || '<tr><td colspan="5" class="empty">Dars topilmadi.</td></tr>';
 }
 
@@ -157,7 +157,7 @@ function lessonsPage() {
     ${heading('KONTENT BOSHQARUVI', 'Darslar', 'Kurs darslarini yarating va ularning holatini boshqaring.', addButton('Yangi dars'))}
     <section class="panel">
       <div class="toolbar">
-        <label class="search">🔍 <input id="search" placeholder="Darslarni qidirish…"></label>
+        <label class="search"><svg class="icon" width="17" height="17" style="vertical-align:-3px;margin-right:4px"><use href="icons.svg#i-search"/></svg> <input id="search" placeholder="Darslarni qidirish…"></label>
         <select class="filter" id="levelFilter">
           <option value="">Barcha darajalar</option>
           ${levelNames.map((x) => `<option value="${x.value}">${x.label}</option>`).join('')}
@@ -179,7 +179,7 @@ function studentsPage() {
     ${heading('O‘QUVCHI FAOLLIGI', 'O‘quvchilar', 'Ilovada ro‘yxatdan o‘tgan o‘quvchilar shu yerda avtomatik paydo bo‘ladi.')}
     <section class="panel">
       <div class="toolbar">
-        <label class="search">🔍 <input id="studentSearch" placeholder="Ism yoki email bo‘yicha qidirish…"></label>
+        <label class="search"><svg class="icon" width="17" height="17" style="vertical-align:-3px;margin-right:4px"><use href="icons.svg#i-search"/></svg> <input id="studentSearch" placeholder="Ism yoki email bo‘yicha qidirish…"></label>
         <button class="button quiet" id="studentReload" type="button">↻ Yangilash</button>
       </div>
       <div class="table-wrap">
@@ -279,7 +279,7 @@ function studentRows(items) {
       <td>${studentStatusTag(x.status)}</td>
       <td class="pay-cell">${paymentCell(x)}</td>
       <td>${formatStudentDate(x.createdAt)}</td>
-      <td><button class="row-action" data-student-delete="${x.id}" title="O‘chirish" aria-label="O‘quvchini o‘chirish">🗑</button></td>
+      <td><button class="row-action" data-student-delete="${x.id}" title="O‘chirish" aria-label="O‘quvchini o‘chirish"><svg class="icon" width="19" height="19" style="color:#d2453c"><use href="icons.svg#i-trash"/></svg></button></td>
     </tr>`).join('') || '<tr><td colspan="8" class="empty">O‘quvchi topilmadi.</td></tr>';
 }
 

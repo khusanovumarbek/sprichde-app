@@ -127,11 +127,18 @@ html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82
   .wrap{padding-top:14px;padding-bottom:40px}
   .topbar{height:52px}
 }
+
+/* SVG ikonlar */
+.icon{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.18em}
+.mod-icon svg.icon{width:24px;height:24px}
+.back svg.icon{width:18px;height:18px}
+.t-avatar svg.icon{width:22px;height:22px}
+.pi-icon svg.icon{width:20px;height:20px}
 </style>
 </head>
 <body>
 <header class="topbar">
-  <a class="back" href="journey.html" aria-label="Sayohatga qaytish">←</a>
+  <a class="back" href="journey.html" aria-label="Sayohatga qaytish"><svg class="icon" width="18" height="18" style=""><use href="icons.svg#i-chevron-left"></use></svg></a>
   <b id="topTitle">Gramatika · Lug‘at · Mashq</b>
 </header>
 
@@ -147,7 +154,7 @@ html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82
     <!-- ================= 1. GRAMATIKA ================= -->
   <div class="mod">
     <div class="mod-head">
-      <span class="mod-icon">📐</span>
+      <span class="mod-icon"><svg class="icon" width="24" height="24" style=""><use href="icons.svg#i-pen"></use></svg></span>
       <span><b>Gramatika</b><small>Qoida va grammatik mashq</small></span>
     </div>
     <div class="grammar-rule" id="grammarRule"></div>
@@ -164,7 +171,7 @@ html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82
   <!-- ================= 2. LUG'AT ================= -->
   <div class="mod">
     <div class="mod-head">
-      <span class="mod-icon">📚</span>
+      <span class="mod-icon"><svg class="icon" width="24" height="24" style=""><use href="icons.svg#i-book"></use></svg></span>
       <span><b>Lug'at</b><small>So'zlarni tinglang va gapirib mashq qiling</small></span>
     </div>
     <div class="practice-hint">Juftligini toping: chap ustundan nemischa so'zni, o'ng ustundan mos o'zbekcha tarjimasini tanlang. Mos juftlik to'g'ri joyiga o'tadi.</div>
@@ -179,7 +186,7 @@ html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82
   <!-- ================= 3. MASHQ ================= -->
   <div class="mod">
     <div class="mod-head">
-      <span class="mod-icon">🧩</span>
+      <span class="mod-icon"><svg class="icon" width="24" height="24" style=""><use href="icons.svg#i-check-circle"></use></svg></span>
       <span><b>Mashq</b><small>Gapni to‘g‘ri tartibga qo‘ying</small></span>
     </div>
     <div class="practice-hint">Tarjimasi: <b id="exerciseHint"></b><br>So‘zlarni to‘g‘ri tartibda qo‘yib gap hosil qiling:</div>
@@ -195,10 +202,10 @@ html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82
     <!-- ================= 4. OVOZ ================= -->
   <div class="mod">
     <div class="mod-head">
-      <span class="mod-icon">🎤</span>
+      <span class="mod-icon"><svg class="icon" width="24" height="24" style=""><use href="icons.svg#i-mic"></use></svg></span>
       <span><b>Ovoz</b><small>So‘zlarni aytib mashq qiling</small></span>
     </div>
-    <div class="practice-hint">Avval 🔊 tugmasini bosib so‘zni tinglang, so‘ng 🎤 tugmasini bosib baland ayting. To‘g‘ri bo‘lsa “To‘g‘ri!” chiqadi.</div>
+    <div class="practice-hint"><svg class="icon" width="14" height="14" style="vertical-align:-2px"><use href="icons.svg#i-volume"></use></svg> tugmasini bosib so‘zni tinglang, so‘ng <svg class="icon" width="14" height="14" style="vertical-align:-2px"><use href="icons.svg#i-mic"></use></svg> tugmasini bosib baland ayting. To‘g‘ri bo‘lsa “To‘g‘ri!” chiqadi.</div>
     <div class="vocab voice-box" id="voiceList"></div>
   </div>
 
@@ -247,8 +254,8 @@ voiceListEl.innerHTML = LESSON.words.map(([de, uz], i) => `
   <div class="vocab-row voice-row">
     <span class="vocab-main"><b>${de}</b><span>${uz}</span></span>
     <span class="vocab-voice">
-      <button class="voice-btn" type="button" data-speak="${i}" aria-label="${de} — talaffuzni eshitish">🔊</button>
-      <button class="voice-btn" type="button" data-listen="${i}" aria-label="${de} — so'zlash">🎤</button>
+      <button class="voice-btn" type="button" data-speak="${i}" aria-label="${de} — talaffuzni eshitish"><svg class="icon" width="17" height="17" style=""><use href="icons.svg#i-volume"></use></svg></button>
+      <button class="voice-btn" type="button" data-listen="${i}" aria-label="${de} — so'zlash"><svg class="icon" width="17" height="17" style=""><use href="icons.svg#i-mic"></use></svg></button>
       <span class="voice-result" data-result="${i}" role="status" aria-live="polite"></span>
     </span>
   </div>`).join('');
@@ -304,7 +311,7 @@ const similarity = (a, b) => {
 };
 function listenWord(target, btn, resultEl) {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const icon = '🎤';
+  const icon = '<svg class="icon" width="17" height="17"><use href="icons.svg#i-mic"></use></svg>';
   if (!SR) {
     resultEl.textContent = 'Chrome’dan foydalaning — brauzer ovoz tanishni qo‘llab-quvvatlamaydi';
     resultEl.className = 'voice-result err';
@@ -315,7 +322,7 @@ function listenWord(target, btn, resultEl) {
   rec.interimResults = false;
   rec.maxAlternatives = 5;
   btn.disabled = true;
-  btn.textContent = '🎙';
+  btn.innerHTML = '<svg class="icon" width="17" height="17"><use href="icons.svg#i-mic"></use></svg>';
   resultEl.textContent = 'Tinglayapman…';
   resultEl.className = 'voice-result heard';
   rec.onresult = (event) => {
@@ -328,7 +335,7 @@ function listenWord(target, btn, resultEl) {
     resultEl.textContent = ok ? 'To‘g‘ri! Barakalla 🎉' : 'Noto‘g‘ri — qayta urinib ko‘ring';
     resultEl.className = 'voice-result ' + (ok ? 'ok' : 'err');
     btn.disabled = false;
-    btn.textContent = icon;
+    btn.innerHTML = icon;
   };
   rec.onerror = (event) => {
     const messages = {
@@ -340,9 +347,9 @@ function listenWord(target, btn, resultEl) {
     resultEl.textContent = messages[event.error] || 'Ovoz tanilmadi — qayta urinib ko‘ring';
     resultEl.className = 'voice-result err';
     btn.disabled = false;
-    btn.textContent = icon;
+    btn.innerHTML = icon;
   };
-  rec.onend = () => { btn.disabled = false; btn.textContent = icon; };
+  rec.onend = () => { btn.disabled = false; btn.innerHTML = icon; };
   try { rec.start(); } catch {}
 }
 const doneBtn = document.getElementById('doneBtn');

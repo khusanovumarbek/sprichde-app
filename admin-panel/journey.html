@@ -86,6 +86,16 @@ html[data-theme="dark"] .day .d-state.premium{background:#3c3218;color:#f0c96a}
   .wrap{padding-top:14px;padding-bottom:40px}
   .topbar{height:52px}
 }
+
+/* SVG ikonlar */
+.icon{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.18em}
+.mod-icon svg.icon{width:24px;height:24px}
+.back svg.icon{width:18px;height:18px}
+.t-avatar svg.icon{width:22px;height:22px}
+.pi-icon svg.icon{width:20px;height:20px}
+
+.icon{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.18em}
+.d-num svg.icon{width:16px;height:16px}
 </style>
 </head>
 <body>
@@ -120,13 +130,15 @@ function paintDays(completedDays, isPremium) {
     // 1-kun — hamma uchun ochiq (Sinov darsi).
     // 2-kundan 91-kungacha — faqat o‘tilgan kunlar yoki premium a’zolar uchun ochiq.
     const locked = !isDone && n !== 1 && !isPremium;
-    const pill = isDone ? 'O‘tilgan' : locked ? '🔒 Premium' : (n === 1 ? 'Sinov darsi' : 'Ochiq');
+    const pill = isDone ? 'O‘tilgan' : locked ? '<svg class="icon" width="13" height="13" style="vertical-align:-2px"><use href="icons.svg#i-lock"></use></svg> Premium' : (n === 1 ? 'Sinov darsi' : 'Ochiq');
     const aria = locked ? (n + '-kun — premium talab qiladi') : (n + '-kun darsi');
     return `
       <div class="day ${isDone ? 'done' : ''} ${locked ? 'locked-day' : ''}" data-day="${n}" role="link" tabindex="0" aria-label="${aria}">
-        <span class="d-num">${isDone ? '✓' : n}</span>
+        <span class="d-num">${isDone ? '<svg class="icon" width="16" height="16"><use href="icons.svg#i-check"></use></svg>' : n}</span>
         <span class="day-icon-wrap">
-          <button class="day-icon" type="button" aria-label="${lesson.title}" aria-expanded="false">${lesson.icon}</button>
+          <button class="day-icon" type="button" aria-label="${lesson.title}" aria-expanded="false">
+            <svg class="icon" width="23" height="23"><use href="icons.svg#i-${lesson.icon}"></use></svg>
+          </button>
           <span class="word-pop" role="status">${(lesson.words || []).slice(0, 2).map(w => w[0] + ' — ' + w[1]).join('  •  ')}</span>
         </span>
         <span class="d-body"><b>${lesson.title}</b><small>${n}-kun</small></span>

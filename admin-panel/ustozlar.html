@@ -56,11 +56,18 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x
   .hero b{font-size:20px}.hero .big{font-size:60px}
   .wrap{padding-top:14px}
 }
+
+/* SVG ikonlar */
+.icon{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.18em}
+.mod-icon svg.icon{width:24px;height:24px}
+.back svg.icon{width:18px;height:18px}
+.t-avatar svg.icon{width:22px;height:22px}
+.pi-icon svg.icon{width:20px;height:20px}
 </style>
 </head>
 <body>
 <header class="topbar">
-  <a class="back" href="app.html" aria-label="Orqaga">←</a>
+  <a class="back" href="app.html" aria-label="Orqaga"><svg class="icon" width="18" height="18" style=""><use href="icons.svg#i-chevron-left"></use></svg></a>
   <b>Ustozlarimiz</b>
 </header>
 
@@ -69,7 +76,7 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x
     <small>USTOZLAR</small>
     <b>Ustozlarimiz —<br>sizga kuchli yordam</b>
     <p>Nemis tili o‘qituvchilar jamoasi tez orada seanslar va darslar uchun sizga ochiladi.</p>
-    <span class="big">🎓</span>
+    <span class="big"><svg class="icon" width="66" height="66" style="color:#ffffffcc"><use href="icons.svg#i-graduation"></use></svg></span>
   </div>
 
   <div class="section">
@@ -104,7 +111,7 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x
   </div>
 
   <div class="t-soon">
-    <div style="font-size:38px">📚</div>
+    <div><svg class="icon" width="38" height="38" style=""><use href="icons.svg#i-book-open"></use></svg></div>
     <b>Ustozlar bilan jonli darslar</b>
     <small>Ustozlarimiz bilan jonli va guruhli darslar, imtihon tayyorgarligi va savol-javob sessiyalari tez orada taqdim etiladi.</small>
   </div>

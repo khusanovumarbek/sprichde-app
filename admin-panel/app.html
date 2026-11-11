@@ -241,7 +241,7 @@ html[data-theme="dark"] .badge-new{color:#ffd98a;background:#4a3a12}
 .nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
 .nav-inner{max-width:520px;margin:0 auto;width:100%;display:flex}
 .nav button{flex:1;border:0;background:none;padding:10px 0 12px;display:flex;flex-direction:column;align-items:center;gap:4px;font:inherit;font-size:10.5px;font-weight:600;color:var(--muted);cursor:pointer}
-.nav button i{font-size:20px;font-style:normal;line-height:1}
+.nav button svg.icon{width:22px;height:22px}
 .nav button.active{color:var(--blue)}
 .nav button.active i{transform:translateY(-1px)}
 
@@ -430,6 +430,20 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
   .feature:active,.social:active{transform:scale(.98)}
   .pay-input{font-size:16px} /* iOS/Android fokusda zoom bo'lmasin */
 }
+
+/* SVG ikonlar */
+.icon{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.18em}
+.nav button svg.icon{width:22px;height:22px}
+.f-icon svg.icon{width:21px;height:21px}
+.pf-icon svg.icon{width:22px;height:22px}
+.pi-icon{background:var(--soft);color:var(--blue);width:40px;height:40px;flex:none;border-radius:14px;display:grid;place-items:center}
+.pi-icon svg.icon{width:20px;height:20px}
+.pi-icon.danger{background:#fdecea;color:#d2453c}
+html[data-theme="dark"] .pi-icon.danger{background:#3a1d1d;color:#f28b82}
+.film-poster svg.icon{width:30px;height:30px}
+.reyt-medal svg.icon{width:44px;height:44px}
+.u-icon svg.icon{width:58px;height:58px}
+.medal.gold{color:#f2c14e}.medal.silver{color:#e6ebf3}.medal.bronze{color:#e0a06a}
 </style>
 </head>
 <body>
@@ -439,7 +453,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
   <section id="view-home" class="page-view">
     <div class="top">
       <div class="hello">
-        <small>GUTEN TAG 👋</small>
+        <small>GUTEN TAG</small>
         <b id="userName">Foydalanuvchi</b>
         <p>Bugun nemis tilida yana bir qadam.</p>
       </div>
@@ -460,7 +474,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
         <span class="j-go">Boshlash ›</span>
       </a>
       <a class="j-ustoz" href="ustozlar.html" aria-label="Ustozlarimiz">
-        <span class="u-icon">🎓</span>
+        <span class="u-icon"><svg class="icon" width="56" height="56" style=""><use href="icons.svg#i-graduation"/></svg></span>
         <div class="u-content">
           <small class="u-eyebrow">USTOZLAR</small>
           <b class="u-title">Ustozlarimiz</b>
@@ -475,14 +489,14 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
 
     <!-- Sinov darsi (do'stni taklif qilishdan tepasida) -->
     <a class="feature tryout" id="trialFeature" href="day.html?day=1">
-      <span class="f-icon">🎬</span>
+      <span class="f-icon"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-play"/></svg></span>
       <span class="f-body"><b>Sinov darsi <span class="badge-new">BEPUL</span></b><small>Sinab ko‘ring — 1-dars</small></span>
       <span class="f-arrow">›</span>
     </a>
 
     <!-- Do'stni taklif qilish -->
     <a class="feature accent" href="invite.html">
-      <span class="f-icon">🎁</span>
+      <span class="f-icon"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-gift"/></svg></span>
       <span class="f-body"><b>Do‘stni taklif qilish</b><small>Havolani ulashing va bonus oling</small></span>
       <span class="f-arrow">›</span>
     </a>
@@ -508,10 +522,10 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
     <div id="reytingContent" hidden>
       <div class="reyt-hero">
         <small>SPRICHDE REYTING</small>
-        <b>Bilim bilan yuring 🏆</b>
+        <b>Bilim bilan yuring <svg class="icon" width="17" height="17" style="vertical-align:-3px"><use href="icons.svg#i-trophy"/></svg></b>
         <p>Har kuni o‘rganing va o‘ringizni ko‘taring</p>
         <div class="reyt-rank-big">
-          <span class="reyt-medal" id="reytMedal">🏅</span>
+          <span class="reyt-medal" id="reytMedal"><svg class="icon" width="44" height="44" style="color:#ffffffb3"><use href="icons.svg#i-award"></use></svg></span>
           <span><small>SIZNING O‘RNINGIZ</small><b id="reytMyRank">#–</b><small id="reytOfTotal">– o‘quvchidan</small></span>
         </div>
       </div>
@@ -554,15 +568,15 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
         <div class="p-avatar">
           <span id="pInitials">?</span>
           <img id="pAvatarImg" alt="Profil rasmi" hidden>
-          <button class="p-cam" type="button" id="pCamBtn" aria-label="Rasmni o‘zgartirish">📷</button>
+          <button class="p-cam" type="button" id="pCamBtn" aria-label="Rasmni o‘zgartirish"><svg class="icon" width="18" height="18" style=""><use href="icons.svg#i-camera"/></svg></button>
         </div>
         <div class="p-info">
           <b id="pName">Foydalanuvchi</b>
           <small id="pEmail">email</small>
         </div>
         <input type="file" id="avatarInputApp" accept="image/*" capture="user" hidden>
-        <button class="p-theme" id="itemTheme" type="button" aria-label="Tungi rejimni almashtirish" title="Tungi rejimga o‘tish"><span id="themeIcon">🌙</span></button>
-        <button class="p-edit" id="editProfileBtn" type="button" aria-label="Tahrirlash">✏️</button>
+        <button class="p-theme" id="itemTheme" type="button" aria-label="Tungi rejimni almashtirish" title="Tungi rejimga o‘tish"><span id="themeIcon"><svg class="icon" width="19" height="19" style=""><use href="icons.svg#i-moon"/></svg></span></button>
+        <button class="p-edit" id="editProfileBtn" type="button" aria-label="Tahrirlash"><svg class="icon" width="19" height="19" style=""><use href="icons.svg#i-edit"/></svg></button>
       </div>
       <div class="p-stats">
         <div class="p-stat"><b id="pStreak">0</b><small>Kunlik faollik</small></div>
@@ -573,12 +587,12 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
 
     <!-- Kurslarim / Premium -->
     <div class="p-feature" id="myCourses">
-      <span class="pf-icon">🎓</span>
+      <span class="pf-icon"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-book-open"/></svg></span>
       <span class="pf-body"><b>Kurslarim</b><small id="pCourseSub">Nemis tili — A1 dan boshlab</small></span>
       <span class="pf-arrow">›</span>
     </div>
     <div class="p-feature premium" id="premiumCard" role="button" tabindex="0">
-      <span class="pf-icon">📖</span>
+      <span class="pf-icon"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-crown"/></svg></span>
       <span class="pf-body"><b>Premium · <span id="pPremiumDays">0</span> kun qoldi</b><small id="pPremiumSub">Premium a’zolik faol</small></span>
       <span class="pf-arrow">›</span>
     </div>
@@ -586,26 +600,26 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
     <!-- Shaxsiy -->
     <div class="p-caption">Shaxsiy</div>
     <div class="p-group">
-      <a class="p-item" href="journey.html"><span class="pi-icon">📜</span><b>Sertifikatlar</b><span class="pi-arrow">›</span></a>
-      <a class="p-item" href="invite.html"><span class="pi-icon">👥</span><b>Do‘stlarni taklif qilish</b><span class="pi-arrow">›</span></a>
+      <a class="p-item" href="journey.html"><span class="pi-icon"><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-award"/></svg></span><b>Sertifikatlar</b><span class="pi-arrow">›</span></a>
+      <a class="p-item" href="invite.html"><span class="pi-icon"><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-share"/></svg></span><b>Do‘stlarni taklif qilish</b><span class="pi-arrow">›</span></a>
     </div>
 
     <!-- Support -->
     <div class="p-caption">Support</div>
     <div class="p-group">
-      <a class="p-item" href="https://t.me/xoosanovv" target="_blank" rel="noopener"><span class="pi-icon">✈️</span><b>Telegram: @xoosanovv</b><span class="pi-arrow">›</span></a>
-      <a class="p-item" href="tel:+998773101230"><span class="pi-icon">📞</span><b>Telefon: +998 77 310-12-30</b><span class="pi-arrow">›</span></a>
-      <a class="p-item" href="mailto:umarkhusanovv@gmail.com"><span class="pi-icon">✉️</span><b>Email: umarkhusanovv@gmail.com</b><span class="pi-arrow">›</span></a>
+      <a class="p-item" href="https://t.me/xoosanovv" target="_blank" rel="noopener"><span class="pi-icon"><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-send"></use></svg></span><b>Telegram: @xoosanovv</b><span class="pi-arrow">›</span></a>
+      <a class="p-item" href="tel:+998773101230"><span class="pi-icon"><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-phone"/></svg></span><b>Telefon: +998 77 310-12-30</b><span class="pi-arrow">›</span></a>
+      <a class="p-item" href="mailto:umarkhusanovv@gmail.com"><span class="pi-icon"><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-mail"/></svg></span><b>Email: umarkhusanovv@gmail.com</b><span class="pi-arrow">›</span></a>
     </div>
 
     <!-- Sozlamalar -->
     <div class="p-caption">Sozlamalar</div>
     <div class="p-group">
       <button class="p-item" id="itemInstall" type="button" hidden>
-        <span class="pi-icon">📲</span><b>Ilovani o‘rnatish</b>
+        <span class="pi-icon"><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-download"></use></svg></span><b>Ilovani o‘rnatish</b>
         <span class="pi-arrow">›</span>
       </button>
-      <button class="p-item" id="itemLogout" type="button"><span class="pi-icon">🚪</span><b>Chiqish</b><span class="pi-arrow">›</span></button>
+      <button class="p-item" id="itemLogout" type="button"><span class="pi-icon danger"><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-log-out"/></svg></span><b>Chiqish</b><span class="pi-arrow">›</span></button>
     </div>
   </section>
 </div>
@@ -660,10 +674,10 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
 <!-- ================= PASTKI NAVIGATSIYA ================= -->
 <nav class="nav">
   <div class="nav-inner">
-    <button data-view="home" class="active"><i>🏠</i>Bosh sahifa</button>
-    <button data-view="films"><i>🎬</i>Filmlar</button>
-    <button data-view="reyting"><i>🏆</i>Reyting</button>
-    <button data-view="profile"><i>👤</i>Profil</button>
+    <button data-view="home" class="active"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-home"/></svg>Bosh sahifa</button>
+    <button data-view="films"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-film"/></svg>Filmlar</button>
+    <button data-view="reyting"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-trophy"/></svg>Reyting</button>
+    <button data-view="profile"><svg class="icon" width="22" height="22" style=""><use href="icons.svg#i-user"/></svg>Profil</button>
   </div>
 </nav>
 
@@ -779,25 +793,25 @@ function renderLessonList() {
 
 // ---------- Filmlar (nemis tilini filmlardan o'rganish) ----------
 const FILMS = [
-  { title: 'Nicos Weg — A1: Der ganze Film', level: 'A1', time: '1:43', poster: 'f-gold', icon: '🧭',
+  { title: 'Nicos Weg — A1: Der ganze Film', level: 'A1', time: '1:43', poster: 'f-gold', icon: 'play',
     kind: 'video', id: '4-eDoThe6qo',
     desc: 'Nico Ispaniyadan Germaniyaga keladi — sumkasi yo‘qolgan. Boshlang‘ich daraja uchun tayyorlangan bepul film.' },
-  { title: 'Nicos Weg — A2: The Movie', level: 'A2', time: '1:35', poster: 'f-red', icon: '🚲',
+  { title: 'Nicos Weg — A2: The Movie', level: 'A2', time: '1:35', poster: 'f-red', icon: 'play',
     kind: 'video', id: 'Lg5P2w_Ro1c',
     desc: 'Nico endi velosiped do‘konida ishlaydi. Kundalik hayot, ish va do‘stlar mavzusidagi dialoglar.' },
-  { title: 'Nicos Weg — B1: The Movie', level: 'B1', time: '1:40', poster: 'f-teal', icon: '🛠️',
+  { title: 'Nicos Weg — B1: The Movie', level: 'B1', time: '1:40', poster: 'f-teal', icon: 'play',
     kind: 'video', id: 'LkufozluseI',
     desc: 'Nico o‘z ustaxonasini ochadi. Ish joyi, stress va rejalar — o‘rta daraja uchun.' },
-  { title: 'Harry — Gefangen in der Zeit (100 qism)', level: 'A1–A2', time: '12:00', poster: 'f-violet', icon: '⏰',
+  { title: 'Harry — Gefangen in der Zeit (100 qism)', level: 'A1–A2', time: '12:00', poster: 'f-violet', icon: 'play',
     kind: 'playlist', id: 'PLs7zUO7VPyJ6Ufol7Z4FfkCviaETvl3c8',
     desc: 'Zamon sayohatchi Harry bilan nemis tilini o‘rganing — 100 ta qisqa, oson tushuniladigan animatsion seriya.' },
-  { title: 'Jojo sucht das Glück (3 fasl)', level: 'B1', time: '33 qism × 3', poster: 'f-ocean', icon: '💃',
+  { title: 'Jojo sucht das Glück (3 fasl)', level: 'B1', time: '33 qism × 3', poster: 'f-ocean', icon: 'play',
     kind: 'playlist', id: 'PLs7zUO7VPyJ5q8vaO9vohSzNntbYvItJR',
     desc: 'Jojo Braziliyadan kelgan qiz — sevgi, intizom va nemis tili. O‘rganuvchilar uchun telenovela.' },
-  { title: 'Das Deutschlandlabor (20 qism)', level: 'A2', time: '20 qism', poster: 'f-green', icon: '🇩🇪',
+  { title: 'Das Deutschlandlabor (20 qism)', level: 'A2', time: '20 qism', poster: 'f-green', icon: 'play',
     kind: 'playlist', id: 'PLs7zUO7VPyJ50sTVsDgfJV6_B3rFYtbFu',
     desc: 'Germaniya haqidagi haqiqatlarni hazil-mutoyiba bilan o‘rganing — har qism 5 daqiqa.' },
-  { title: 'Ticket nach Berlin', level: 'B2', time: '6 qism', poster: 'f-slate', icon: '🚆',
+  { title: 'Ticket nach Berlin', level: 'B2', time: '6 qism', poster: 'f-slate', icon: 'play',
     kind: 'playlist', id: 'PLs7zUO7VPyJ4d4Qrm14DUNGjW0TX_LXQn',
     desc: 'Oltita yosh nemis tilini o‘rganayotgan yoshlar Germaniya bo‘ylab sayohat qiladi — madaniyat va til.' },
 ];
@@ -826,7 +840,7 @@ function renderFilms() {
   const seen = loadSeenFilms();
   box.innerHTML = FILMS.map((film, i) => `
     <button type="button" class="film" data-film="${i}" aria-label="${film.title} filmini ko‘rish">
-      <span class="film-poster ${film.poster}"><i>${film.icon}</i><small>${film.level}</small></span>
+      <span class="film-poster ${film.poster}"><svg class="icon" width="30" height="30"><use href="icons.svg#i-play"/></svg><small>${film.level}</small></span>
       <span class="film-body"><b>${film.title}</b><small>${film.desc}</small>
         <span class="film-meta"><span class="film-level">${film.level}</span><span class="film-time">⏱ ${film.time}</span>${seen.includes(i) ? '<span class="film-seen">✓ Ko‘rildi</span>' : ''}</span>
       </span>
@@ -895,7 +909,7 @@ function initialsOf(name) {
   return parts.slice(0, 2).map((p) => p[0].toUpperCase()).join('');
 }
 function reytRow(e) {
-  const medal = e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : e.rank === 3 ? '🥉' : e.rank;
+  const medal = e.rank === 1 ? '<svg class="icon medal gold" width="24" height="24"><use href="icons.svg#i-award"/></svg>' : e.rank === 2 ? '<svg class="icon medal silver" width="24" height="24"><use href="icons.svg#i-award"/></svg>' : e.rank === 3 ? '<svg class="icon medal bronze" width="24" height="24"><use href="icons.svg#i-award"/></svg>' : e.rank;
   const rankCls = e.rank <= 3 ? 'reyt-rank medal' : 'reyt-rank';
   return '<div class="reyt-row' + (e.isMe ? ' me' : '') + '">'
     + '<span class="' + rankCls + '">' + medal + '</span>'
@@ -908,7 +922,7 @@ function paintReyting(data) {
   const me = data.me || { rank: 0, days: 0, points: 0, name: '' };
   el('reytMyRank').textContent = '#' + (me.rank || '–');
   el('reytOfTotal').textContent = 'jami ' + (data.totalStudents || 0) + ' o‘quvchidan';
-  el('reytMedal').textContent = me.rank === 1 ? '🥇' : me.rank === 2 ? '🥈' : me.rank === 3 ? '🥉' : '🏅';
+  el('reytMedal').innerHTML = me.rank === 1 ? '<svg class="icon medal gold" width="44" height="44"><use href="icons.svg#i-award"/></svg>' : me.rank === 2 ? '<svg class="icon medal silver" width="44" height="44"><use href="icons.svg#i-award"/></svg>' : me.rank === 3 ? '<svg class="icon medal bronze" width="44" height="44"><use href="icons.svg#i-award"/></svg>' : '<svg class="icon" width="42" height="42" style="color:#ffffffb3"><use href="icons.svg#i-award"/></svg>';
   el('reytMyDays').textContent = me.days || 0;
   el('reytMyPoints').textContent = me.points || 0;
   const diff = Math.round(((me.points || 0) - (data.average || 0)) * 10) / 10;
@@ -923,7 +937,7 @@ function paintReyting(data) {
   const rank = me.rank || 0;
   const above = (data.top || []).filter((e) => e.rank < rank).sort((a, b) => b.rank - a.rank)[0];
   if (!rank || rank <= 1 || !above) {
-    el('reytToNext').textContent = '🏆 1-o‘rin';
+    el('reytToNext').innerHTML = '<svg class="icon" width="14" height="14" style="vertical-align:-2px"><use href="icons.svg#i-crown"/></svg> 1-o‘rin';
     el('reytBeAbove').textContent = '0';
     el('reytFill').style.width = '100%';
   } else {
@@ -1061,7 +1075,7 @@ el('seeAllLessons').addEventListener('click', (e) => {
 function paintTheme() {
   if (!window.SolTheme) return;
   const dark = SolTheme.current() === 'dark';
-  el('themeIcon').textContent = dark ? '☀️' : '🌙';
+  el('themeIcon').innerHTML = dark ? '<svg class="icon" width="19" height="19"><use href="icons.svg#i-sun"/></svg>' : '<svg class="icon" width="19" height="19"><use href="icons.svg#i-moon"/></svg>';
   el('itemTheme').title = dark ? 'Kunduzgi rejimga o‘tish' : 'Tungi rejimga o‘tish';
   el('itemTheme').setAttribute('aria-label', el('itemTheme').title);
 }

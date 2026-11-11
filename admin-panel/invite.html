@@ -83,6 +83,13 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x
   .stat b{font-size:18px}
   .stat small{font-size:10px}
 }
+
+/* SVG ikonlar */
+.icon{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.18em}
+.mod-icon svg.icon{width:24px;height:24px}
+.back svg.icon{width:18px;height:18px}
+.t-avatar svg.icon{width:22px;height:22px}
+.pi-icon svg.icon{width:20px;height:20px}
 </style>
 </head>
 <body>
@@ -93,7 +100,7 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x
 
 <div class="wrap">
   <div class="hero">
-    <div class="gift">🎁</div>
+    <div class="gift"><svg class="icon" width="38" height="38" style=""><use href="icons.svg#i-gift"></use></svg></div>
     <h1>Do‘stingizni taklif qiling</h1>
     <p>Havolani ulashing — do‘stingiz ro‘yxatdan o‘tsa, ikkalangiz ham bonus darslarga ega bo‘lasiz.</p>
   </div>
@@ -107,9 +114,9 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x
 
   <div class="title">Tez ulashish</div>
   <div class="socials">
-    <div class="social" data-share="telegram"><i>✈️</i><b>Telegram</b></div>
-    <div class="social" data-share="whatsapp"><i>💬</i><b>WhatsApp</b></div>
-    <div class="social" data-share="sms"><i>📱</i><b>SMS</b></div>
+    <div class="social" data-share="telegram"><i><svg class="icon" width="26" height="26" style=""><use href="icons.svg#i-send"></use></svg></i><b>Telegram</b></div>
+    <div class="social" data-share="whatsapp"><i><svg class="icon" width="26" height="26" style=""><use href="icons.svg#i-phone"></use></svg></i><b>WhatsApp</b></div>
+    <div class="social" data-share="sms"><i><svg class="icon" width="26" height="26" style=""><use href="icons.svg#i-message"></use></svg></i><b>SMS</b></div>
   </div>
 
   <div class="stats">
@@ -123,10 +130,10 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x
   <div class="sheet">
     <div class="handle"></div>
     <h3>Ulashish</h3>
-    <div class="sheet-item" data-share="telegram"><i>✈️</i><b>Telegram</b></div>
-    <div class="sheet-item" data-share="whatsapp"><i>💬</i><b>WhatsApp</b></div>
-    <div class="sheet-item" data-share="sms"><i>📱</i><b>SMS orqali</b></div>
-    <div class="sheet-item" id="sheetCopy"><i>🔗</i><b>Havolani nusxalash</b></div>
+    <div class="sheet-item" data-share="telegram"><i><svg class="icon" width="26" height="26" style=""><use href="icons.svg#i-send"></use></svg></i><b>Telegram</b></div>
+    <div class="sheet-item" data-share="whatsapp"><i><svg class="icon" width="26" height="26" style=""><use href="icons.svg#i-phone"></use></svg></i><b>WhatsApp</b></div>
+    <div class="sheet-item" data-share="sms"><i><svg class="icon" width="20" height="20" style=""><use href="icons.svg#i-phone"></use></svg></i><b>SMS orqali</b></div>
+    <div class="sheet-item" id="sheetCopy"><i><svg class="icon" width="26" height="26" style=""><use href="icons.svg#i-copy"></use></svg></i><b>Havolani nusxalash</b></div>
   </div>
 </div>
 
