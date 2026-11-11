@@ -39,7 +39,7 @@ Demo manzillari:
 
 ## Muhim ogohlantirishlar (ochiq internetga chiqish oldidan)
 
-1. **Admin panel parolsiz** — hozirgi rejimda internetdagi har kim `/admin.html` ochib o‘quvchi ma’lumotlarini va parollarni ko‘radi, o‘quvchilarni o‘chiradi/bloklaydi. Jonli demo qilishdan oldin **admin himoyasini qayta yoqing** (kompyuterdagi demo uchun parolsiz qolishi mumkin, lekin ochiq URL uchun yo‘q).
+1. **Admin panel parolsiz ochiladi** — `/admin.html` ochilganda panel darhol ko‘rinadi (demo admin `SEED_ADMIN` — `admin@sprichde.uz` / `admin123` — avtomatik yoziladi). U ataylab internet/ochiq URL uchun emas: ochiq joylashtirib bo‘lmaydi. Haqiqiy loyihada `SEED_ADMIN` ni o‘zgartiring va admin himoyasini qayta yoqing (yoki admin panelni alohida himoyalangan manzilga ko‘chiring).
 2. **Demo bazada haqiqiy o‘quvchilar bo‘lmasin** — faqat demo seed foydalanuvchilar bo‘lsin (repo'da `.db` yo‘qligi buni ta'minlaydi).
 3. **Bepul Render** 15 daqiqa faoliyatsizlikdan keyin “uxlaydi” — birinchi ochilish 30–60 s vaqt olishi mumkin (bu demo uchun normal).
 4. **Ma’lumot vaqtinchalik** — har deploy/restart'da o‘quvchilar va to‘lovlar asl demo holatiga qaytadi. Demo uchun bu yaxshi; real mijozlarga ma’lumot kerak bo‘lsa — paid disk yoki Postgres.

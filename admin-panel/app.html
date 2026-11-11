@@ -4,12 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f8fc">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1b33">
 <title>SprichDe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="auth.js"></script>
 <script src="theme.js"></script>
+<script src="lessons-data.js"></script>
 <link rel="manifest" href="manifest.json">
 <meta name="application-name" content="SprichDe">
 <meta name="mobile-web-app-capable" content="yes">
@@ -27,7 +29,7 @@
   --ink:var(--text);
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
 body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 .wrap{max-width:520px;margin:0 auto;padding:0 20px 110px;
   /* Notch va pastdagi safe-area uchun */
@@ -39,7 +41,7 @@ body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;-webkit-fo
 .hello small{display:block;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.4px}
 .hello b{font-size:22px;font-weight:800;display:block;margin-top:2px}
 .hello p{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
-.avatar{width:46px;height:46px;border-radius:15px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
+.avatar{width:46px;height:46px;border:0;padding:0;border-radius:15px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;flex:none;cursor:pointer;font-family:inherit;transition:transform .18s,box-shadow .18s}.avatar:hover,.avatar:focus-visible{transform:translateY(-2px);box-shadow:0 5px 14px #3157a433;outline:2px solid var(--blue);outline-offset:3px}
 
 /* ---------- 91 kunlik sayohat (katta karta) ---------- */
 .journey-card{
@@ -79,8 +81,17 @@ body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;-webkit-fo
 .row-meta{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;font-weight:600;color:#ffffffd9}
 
 /* ---------- Xususiyat kartalari ---------- */
-.feature{margin-top:14px;display:flex;align-items:center;gap:14px;padding:16px;border-radius:20px;background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:transform .12s, box-shadow .15s;text-decoration:none;color:inherit}
+.feature{margin-top:16px;display:flex;align-items:center;gap:18px;padding:18px;border-radius:20px;background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:transform .12s, box-shadow .15s;text-decoration:none;color:inherit}
 .feature:active{transform:scale(.985)}
+.feature[hidden]{display:none!important}
+@media (hover:hover) and (pointer:fine){
+  .feature{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  .feature:hover{transform:translateY(-2px);box-shadow:0 10px 24px #1d2b4b14;border-color:var(--soft-line)}
+  .feature:hover .f-icon{transform:scale(1.08) rotate(-3deg)}
+  .f-icon{transition:transform .2s ease,background .2s ease}
+  .feature:hover .f-arrow{transform:translateX(3px)}
+  .f-arrow{transition:transform .2s ease}
+}
 .feature.accent{background:var(--soft-2);border-color:var(--soft-line)}
 /* Sinov darsi — ajralib turadigan, "yangi" ko'rinish */
 .feature.tryout{background:linear-gradient(135deg,#fff6e6,#ffefd4);border-color:#f5dfb0}
@@ -101,12 +112,102 @@ html[data-theme="dark"] .badge-new{color:#ffd98a;background:#4a3a12}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}
 .section-head b{font-size:16px;font-weight:800}
 .section-head a{font-size:12px;color:var(--blue);font-weight:700;text-decoration:none}
-.lesson{display:flex;align-items:center;gap:14px;padding:13px;border-radius:18px;background:var(--surface);border:1px solid var(--line);margin-bottom:10px;cursor:pointer}
+.lesson{display:flex;align-items:center;gap:14px;padding:13px;border-radius:18px;background:var(--surface);border:1px solid var(--line);margin-bottom:10px;cursor:pointer;text-decoration:none;color:inherit}
 .lesson .l-icon{width:44px;height:44px;border-radius:13px;background:var(--soft);display:grid;place-items:center;font-size:19px;flex:none}
 .lesson .l-body{flex:1;min-width:0}
 .lesson .l-body b{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lesson .l-body small{font-size:11.5px;color:var(--muted)}
 .lesson .l-arrow{color:var(--muted)}
+
+/* ---------- Filmlar ---------- */
+.film{display:flex;gap:13px;padding:11px;border-radius:18px;background:var(--surface);border:1px solid var(--line);margin-bottom:10px;cursor:pointer;text-decoration:none;color:inherit;transition:transform .12s,border-color .15s}
+.film:active{transform:scale(.985)}
+.film-poster{width:108px;flex:none;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;padding:10px 6px;text-align:center}
+.film-poster i{font-size:30px;font-style:normal;line-height:1}
+.film-poster small{font-size:8.5px;font-weight:800;letter-spacing:1.2px;color:#ffffffcc}
+.f-gold{background:linear-gradient(150deg,#b8860b,#e0a93e 55%,#f5d878)}
+.f-red{background:linear-gradient(150deg,#8e2f2f,#c05353 55%,#e78a8a)}
+.f-teal{background:linear-gradient(150deg,#0e4d55,#18707d 55%,#3fa9b8)}
+.f-violet{background:linear-gradient(150deg,#46306e,#6d4fc4 55%,#a48de8)}
+.f-green{background:linear-gradient(150deg,#1d4a2a,#2f7a4a 55%,#62b585)}
+.f-slate{background:linear-gradient(150deg,#22293c,#39415e 55%,#5f6b93)}
+.f-ocean{background:linear-gradient(150deg,#103f5e,#1a5f8a 55%,#3d97bd)}
+.film-body{flex:1;min-width:0}
+.film-body b{display:block;font-size:13.5px;font-weight:800;line-height:1.35}
+.film-body small{display:block;font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.film-meta{display:flex;align-items:center;gap:8px;margin-top:7px}
+.film-level{font-size:9px;font-weight:800;letter-spacing:.6px;color:var(--blue);background:var(--soft);border-radius:20px;padding:3px 9px}
+.film-time{font-size:10.5px;color:var(--muted);font-weight:600}
+.film-seen{margin-left:auto;font-size:11px;font-weight:800;color:#1d7a44}
+.films-note{font-size:11px;color:var(--muted);line-height:1.6;text-align:center;padding:6px 14px 0}
+@media (hover:hover) and (pointer:fine){.film:hover{border-color:var(--blue)}}
+
+/* ---------- Film pleyer oynasi ---------- */
+.player-bg{position:fixed;inset:0;z-index:60;background:#060d1cd9;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px}
+.player-bg[hidden]{display:none}
+.player-box{width:100%;max-width:720px;background:var(--surface);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px #00000066}
+.player-head{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line)}
+.player-head b{flex:1;min-width:0;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-frame{aspect-ratio:16/9;width:100%;background:#000}
+.player-frame iframe{width:100%;height:100%;border:0;display:block}
+.player-foot{display:flex;gap:9px;padding:12px 15px;flex-wrap:wrap}
+.player-foot button,.player-foot a{flex:1;min-width:140px;height:42px;border:0;border-radius:11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:grid;place-items:center}
+.pf-seen{background:var(--soft-2);color:var(--blue)}
+.pf-yt{background:#c00;color:#fff}
+.pf-close{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)!important}
+
+/* ---------- Reyting ---------- */
+.reyt-empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:13px}
+.reyt-hero{background:linear-gradient(150deg,#0f7a3d 0%,#19a653 55%,#3ed07c 100%);border-radius:24px;padding:20px;color:#fff;box-shadow:0 14px 34px #0f7a3d33;position:relative;overflow:hidden}
+.reyt-hero::before{content:'';position:absolute;width:190px;height:190px;border-radius:50%;background:#ffffff1f;right:-70px;top:-70px}
+.reyt-hero small{position:relative;font-size:9.5px;font-weight:800;letter-spacing:1.6px;color:#ffffffcc}
+.reyt-hero > b{position:relative;display:block;font-size:19px;font-weight:800;margin-top:4px}
+.reyt-hero > p{position:relative;margin:4px 0 0;font-size:11px;color:#ffffffd9}
+.reyt-rank-big{position:relative;display:flex;align-items:center;gap:14px;margin-top:14px;background:#ffffff21;border:1px solid #ffffff2e;border-radius:17px;padding:12px 14px;backdrop-filter:blur(2px)}
+.reyt-medal{font-size:44px;line-height:1;flex:none}
+.reyt-rank-big small{display:block;font-size:9px;font-weight:800;letter-spacing:1px;color:#ffffffcc}
+.reyt-rank-big b{display:block;font-size:30px;font-weight:800;line-height:1.05;margin:2px 0}
+.reyt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 14px}
+.reyt-stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:13px 10px;text-align:center;box-shadow:var(--shadow)}
+.reyt-stat b{display:block;font-size:19px;font-weight:800;letter-spacing:-.4px}
+.reyt-stat small{display:block;font-size:8.5px;font-weight:800;letter-spacing:1px;color:var(--muted);margin-top:4px}
+.reyt-stat.gold b{color:#b8860b}
+.reyt-stat.green b{color:#19a653}
+.reyt-stat.purple b{color:#6d5ef0}
+.reyt-me-card{background:linear-gradient(160deg,#6d5ef0 0%,#4f3bd1 100%);border-radius:22px;padding:16px;color:#fff;box-shadow:0 16px 36px #4f3bd140}
+.reyt-me-head{display:flex;align-items:center;gap:12px}
+.reyt-me-info{flex:1;min-width:0}
+.reyt-me-info small{display:block;font-size:8.5px;font-weight:800;letter-spacing:1.2px;color:#ffffffb3}
+.reyt-me-info b{display:block;font-size:16px;font-weight:800;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reyt-pct{text-align:right;flex:none}
+.reyt-pct small{display:block;font-size:8.5px;font-weight:800;letter-spacing:1px;color:#ffffffb3}
+.reyt-pct b{display:block;font-size:15px;font-weight:800;margin-top:2px}
+.reyt-avatar{width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:800;color:#fff;background:#19a653}
+.reyt-avatar.a1{background:#e0a93e}.reyt-avatar.a2{background:#c05353}.reyt-avatar.a3{background:#18707d}.reyt-avatar.a4{background:#6d4fc4}.reyt-avatar.a5{background:#2f7a4a}.reyt-avatar.a6{background:#1a5f8a}
+.reyt-avatar-lg{width:54px;height:54px;font-size:18px}
+.reyt-track{height:10px;border-radius:10px;background:#ffffff33;overflow:hidden;margin:13px 0 12px}
+.reyt-fill{height:100%;border-radius:10px;background:#fff;transition:width .5s ease}
+.reyt-me-foot{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;border-top:1px solid #ffffff2e;padding-top:11px}
+.reyt-me-foot b{display:block;font-size:15px;font-weight:800}
+.reyt-me-foot small{display:block;font-size:8px;font-weight:800;letter-spacing:1px;color:#ffffffb3;margin-top:2px}
+.reyt-list-head{display:flex;align-items:center;justify-content:space-between;background:#19a653;color:#fff;border-radius:15px;padding:10px 13px;margin:4px 0 11px}
+.reyt-list-head b{font-size:13px;font-weight:800}
+.reyt-list-head small{font-size:10px;color:#ffffffd9;margin-left:6px}
+.reyt-avg-pill{font-size:11px;font-weight:700;background:#ffffff26;border-radius:20px;padding:5px 11px;white-space:nowrap}
+.reyt-avg-pill b{font-size:11px}
+.reyt-row{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:16px;background:#19a653;color:#fff;margin-bottom:9px;border:2px solid transparent}
+.reyt-row:nth-child(even){background:#0f7a3d}
+.reyt-row.me{background:var(--surface);border-color:var(--blue);color:var(--text);box-shadow:var(--shadow)}
+.reyt-rank{width:30px;flex:none;text-align:center;font-size:14px;font-weight:800}
+.reyt-rank.medal{font-size:22px}
+.reyt-row .reyt-name{flex:1;min-width:0;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reyt-row-info{text-align:right;flex:none}
+.reyt-row-info b{display:block;font-size:12.5px;font-weight:800}
+.reyt-row-info small{display:block;font-size:9.5px;color:inherit;opacity:.85;margin-top:1px}
+.reyt-me-chip{font-size:8px;font-weight:800;letter-spacing:.6px;background:var(--blue);color:#fff;border-radius:20px;padding:2px 7px;margin-left:6px;vertical-align:1px}
+.reyt-sep{text-align:center;font-size:10px;font-weight:800;color:var(--muted);padding:2px 0 9px}
+.reyt-note{font-size:10px;color:var(--muted);text-align:center;margin-top:4px}
+.reyt-list-empty{text-align:center;color:var(--muted);padding:34px 20px;font-size:12px}
 
 /* ---------- Pastki navigatsiya ---------- */
 .nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
@@ -124,35 +225,6 @@ html[data-theme="dark"] .badge-new{color:#ffd98a;background:#4a3a12}
 .page-view[hidden]{display:none}
 
 /* ---------- Gap tuzish mashqi ---------- */
-.practice-card{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
-
-.practice-hint{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
-.practice-hint b{color:var(--text)}
-.practice-answer{min-height:56px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1.5px dashed var(--line);border-radius:14px;padding:10px;background:var(--surface-2);margin-bottom:12px}
-.practice-placeholder{color:var(--muted);font-size:13px;margin:0 auto}
-.practice-bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 15px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,border-color .15s,opacity .15s}
-.chip:active{transform:scale(.94)}
-.chip.selected{border-color:var(--blue);opacity:.65}
-.practice-feedback{min-height:22px;font-size:14px;font-weight:800;margin-bottom:10px;line-height:1.4}
-.practice-feedback.ok{color:#1d7a44}
-.practice-feedback.err{color:#d2453c}
-.practice-actions{display:flex;gap:10px}
-.practice-btn{height:48px;border:0;border-radius:13px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
-.practice-reset{flex:1;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
-.practice-check{flex:1.5;background:var(--blue);color:#fff}
-.practice-check:disabled{opacity:.5;cursor:not-allowed}
-
-/* ---------- So'zlar juftligini topish mashqi ---------- */
-.words-card{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
-.words-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
-.words-col{display:grid;gap:8px}
-.chip.matched{border-color:#1d7a44;background:#e7f6ec;color:#1d7a44;pointer-events:none}
-html[data-theme="dark"] .chip.matched{background:#1d3a28;color:#57d18a;border-color:#57d18a}
-.chip.picked{border-color:var(--blue);box-shadow:0 0 0 2px var(--soft)}
-.chip.matched-flash-err{border-color:#d2453c;background:#fdecea;color:#d2453c}
-html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82}
-#wordsReset{width:100%;margin-top:4px}
 
 /* ============================================================
  * PROFIL SAHIFASI
@@ -174,6 +246,9 @@ html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82
 .p-edit{width:38px;height:38px;flex:none;border-radius:12px;border:1px solid var(--line);
   background:var(--surface-2);font-size:15px;cursor:pointer;display:grid;place-items:center}
 .p-edit:active{transform:scale(.94)}
+.p-theme{width:38px;height:38px;flex:none;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.p-theme:active{transform:scale(.94)}
+.p-theme:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .p-stats{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);
   background:var(--soft-2);border-radius:16px;padding:16px 0}
 .p-stat{text-align:center;position:relative}
@@ -282,7 +357,28 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
   .lesson .l-icon{width:40px;height:40px;font-size:17px}
   .nav button{font-size:9.5px}
   .nav button i{font-size:18px}
+  /* To'lov oynasi: karta raqami va rejalar 320px kenglikda ham sig'sin */
+  .pay-card{padding:14px}
+  .pay-card b{font-size:16.5px;letter-spacing:.4px;margin:6px 0 3px}
+  .pay-card span{font-size:11px}
+  .pay-copy{right:10px;top:10px;padding:5px 8px;font-size:10px}
+  .pay-plans{gap:6px}
+  .pay-plan{padding:9px 4px}
+  .pay-plan b{font-size:12px}
+  .pay-plan span{font-size:10px}
+  .pay-input{font-size:16px} /* iOS'da fokusda zoom bo'lmasin */
+  /* So'zlar juftligi mashqi: uzun nemischa so'zlar sig'sin */
+  /* Profil: uzun email va statistika sig'sin */
+  .profile-card{padding:15px}
+  .p-stats{padding:14px 0}
+  .p-stat b{font-size:19px}
+  .p-info small{font-size:11.5px}
   }
+
+/* Oddiy telefonlar (381–520px): iOS fokusda zoom bo'lmasligi uchun input 16px */
+@media (max-width: 520px){
+  .pay-input{font-size:16px}
+}
 
 /* Katta telefonlar / kichik planshetlar: markazlashgan ustun saqlanadi */
 
@@ -302,6 +398,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
 /* Teginish (touch) qurilmalarda hover effektlarini o'chiramiz */
 @media (hover: none){
   .feature:active,.social:active{transform:scale(.98)}
+  .pay-input{font-size:16px} /* iOS/Android fokusda zoom bo'lmasin */
 }
 </style>
 </head>
@@ -316,7 +413,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
         <b id="userName">Foydalanuvchi</b>
         <p>Bugun nemis tilida yana bir qadam.</p>
       </div>
-      <div class="avatar" id="userAvatar">?</div>
+      <button class="avatar" id="userAvatar" type="button" aria-label="Profilga o‘tish" title="Profilga o‘tish">?</button>
     </div>
 
     <!-- 91 kunlik sayohat (katta karta) -->
@@ -333,7 +430,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
     </a>
 
     <!-- Sinov darsi (do'stni taklif qilishdan tepasida) -->
-    <a class="feature tryout" href="trial.html">
+    <a class="feature tryout" id="trialFeature" href="day.html?day=1">
       <span class="f-icon">🎬</span>
       <span class="f-body"><b>Sinov darsi <span class="badge-new">BEPUL</span></b><small>Sinab ko‘ring — 1-dars</small></span>
       <span class="f-arrow">›</span>
@@ -351,38 +448,57 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
     <div id="lessonList"></div>
   </section>
 
-  <!-- ================= DARSLAR ================= -->
-  <section id="view-lessons" class="page-view" hidden>
-    <div class="top"><div class="hello"><small>O‘QUV BO‘LIMI</small><b>Darslar</b><p>Darajangizga mos darslar.</p></div></div>
-    <div id="lessonsFull"></div>
+  <!-- ================= FILMLAR ================= -->
+  <section id="view-films" class="page-view" hidden>
+    <div class="top"><div class="hello"><small>KINOLAR</small><b>Filmlar</b><p>Nemis tilini filmlardan o‘rganing.</p></div></div>
+    <div id="filmList"></div>
+    <p class="films-note">Filmlar keyinchalik qo‘shiladi — hozircha Deutsche Welle’ning bepul o‘rganish uchun mo‘ljallangan film va seriallari joylashtirilgan.</p>
   </section>
 
-  <!-- ================= SO'ZLAR ================= -->
-  <section id="view-words" class="page-view" hidden>
-    <div class="top"><div class="hello"><small>LUG‘AT</small><b>So‘zlar</b><p>Nemischa va o‘zbekcha juftliklarni toping.</p></div></div>
-    <div class="words-card">
-      <div class="practice-hint">Chap ustundan nemischa so‘zni, o‘ng ustundan mos o‘zbekcha tarjimasini tanlang. Mos juftlik to‘g‘ri joyiga o‘tadi.</div>
-      <div class="words-grid">
-        <div class="words-col" id="wordsDe" aria-label="Nemischa"></div>
-        <div class="words-col" id="wordsUz" aria-label="O‘zbekcha"></div>
-      </div>
-      <div class="practice-feedback" id="wordsFeedback" role="status" aria-live="polite"></div>
-      <button class="practice-btn practice-reset" id="wordsReset" type="button">Qayta aralashtirish</button>
-    </div>
-  </section>
+  <!-- ================= REYTING ================= -->
+  <section id="view-reyting" class="page-view" hidden>
+    <div class="top"><div class="hello"><small>REYTING</small><b>Reyting</b><p>Boshqa o‘quvchilar bilan oradagi farq.</p></div></div>
 
-  <!-- ================= MASHQ ================= -->
-  <section id="view-practice" class="page-view" hidden>
-    <div class="top"><div class="hello"><small>MASHG‘ULOT</small><b>Mashq</b><p>Gapni so‘zlarini to‘g‘ri tartibga qo‘ying.</p></div></div>
-    <div class="practice-card">
-      <div class="practice-hint">Tarjimasi: <b>«Men bugun nemis tilini o‘rganyapman»</b><br>So‘zlarni to‘g‘ri tartibda qo‘yib gap hosil qiling:</div>
-      <div class="practice-answer" id="answerBox"><span class="practice-placeholder">So‘zlarni tanlang…</span></div>
-      <div class="practice-bank" id="wordBank"></div>
-      <div class="practice-feedback" id="practiceFeedback" role="status" aria-live="polite"></div>
-      <div class="practice-actions">
-        <button class="practice-btn practice-reset" id="resetPractice" type="button">Qayta urinish</button>
-        <button class="practice-btn practice-check" id="checkPractice" type="button">Tekshirish ✓</button>
+    <div class="reyt-empty" id="reytingLoading">Reyting yuklanmoqda…</div>
+
+    <div id="reytingContent" hidden>
+      <div class="reyt-hero">
+        <small>SPRICHDE REYTING</small>
+        <b>Bilim bilan yuring 🏆</b>
+        <p>Har kuni o‘rganing va o‘ringizni ko‘taring</p>
+        <div class="reyt-rank-big">
+          <span class="reyt-medal" id="reytMedal">🏅</span>
+          <span><small>SIZNING O‘RNINGIZ</small><b id="reytMyRank">#–</b><small id="reytOfTotal">– o‘quvchidan</small></span>
+        </div>
       </div>
+
+      <div class="reyt-stats">
+        <div class="reyt-stat green"><b id="reytMyDays">0</b><small>KUN O‘TILDI</small></div>
+        <div class="reyt-stat gold"><b id="reytMyPoints">0</b><small>BALL</small></div>
+        <div class="reyt-stat purple"><b id="reytMyAvg">–</b><small>O‘RTACHADAN</small></div>
+      </div>
+
+      <div class="reyt-me-card">
+        <div class="reyt-me-head">
+          <span class="reyt-avatar reyt-avatar-lg" id="reytMyAvatar">?</span>
+          <span class="reyt-me-info"><small>SIZNING NATIJANGIZ</small><b id="reytMyName">Siz</b></span>
+          <span class="reyt-pct"><small>KEYINGI O‘RINGA</small><b id="reytToNext">–</b></span>
+        </div>
+        <div class="reyt-track"><div class="reyt-fill" id="reytFill" style="width:0%"></div></div>
+        <div class="reyt-me-foot">
+          <span><b id="reytAvg">–</b><small>GURUH O‘RTACHASI</small></span>
+          <span><b id="reytBeAbove">–</b><small>OLDINGI O‘RINGA</small></span>
+          <span><b id="reytDays">–</b><small>O‘TILGAN KUN</small></span>
+        </div>
+      </div>
+
+      <div class="reyt-list-head">
+        <span><b>O‘quvchilar</b><small id="reytTotal">– ta</small></span>
+        <span class="reyt-avg-pill">O‘rtacha <b id="reytAvgInline">–</b> ball</span>
+      </div>
+
+      <div class="reyt-list" id="reytList"></div>
+      <p class="reyt-note">Ball = o‘tilgan kunlar × 50. Reyting har kuni yangilanadi.</p>
     </div>
   </section>
 
@@ -399,6 +515,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
           <b id="pName">Foydalanuvchi</b>
           <small id="pEmail">email</small>
         </div>
+        <button class="p-theme" id="itemTheme" type="button" aria-label="Tungi rejimni almashtirish" title="Tungi rejimga o‘tish"><span id="themeIcon">🌙</span></button>
         <button class="p-edit" id="editProfileBtn" type="button" aria-label="Tahrirlash">✏️</button>
       </div>
       <div class="p-stats">
@@ -423,10 +540,16 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
     <!-- Shaxsiy -->
     <div class="p-caption">Shaxsiy</div>
     <div class="p-group">
-      <button class="p-item" id="itemProfile" type="button"><span class="pi-icon">👤</span><b>Profil</b><span class="pi-arrow">›</span></button>
       <a class="p-item" href="journey.html"><span class="pi-icon">📜</span><b>Sertifikatlar</b><span class="pi-arrow">›</span></a>
       <a class="p-item" href="invite.html"><span class="pi-icon">👥</span><b>Do‘stlarni taklif qilish</b><span class="pi-arrow">›</span></a>
-      <button class="p-item" id="itemPassword" type="button"><span class="pi-icon">🔒</span><b>Parolni o‘zgartirish</b><span class="pi-arrow">›</span></button>
+    </div>
+
+    <!-- Support -->
+    <div class="p-caption">Support</div>
+    <div class="p-group">
+      <a class="p-item" href="https://t.me/xoosanovv" target="_blank" rel="noopener"><span class="pi-icon">✈️</span><b>Telegram: @xoosanovv</b><span class="pi-arrow">›</span></a>
+      <a class="p-item" href="tel:+998773101230"><span class="pi-icon">📞</span><b>Telefon: +998 77 310-12-30</b><span class="pi-arrow">›</span></a>
+      <a class="p-item" href="mailto:umarkhusanovv@gmail.com"><span class="pi-icon">✉️</span><b>Email: umarkhusanovv@gmail.com</b><span class="pi-arrow">›</span></a>
     </div>
 
     <!-- Sozlamalar -->
@@ -436,12 +559,24 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
         <span class="pi-icon">📲</span><b>Ilovani o‘rnatish</b>
         <span class="pi-arrow">›</span>
       </button>
-      <button class="p-item" id="itemTheme" type="button">
-        <span class="pi-icon" id="themeIcon">🌙</span><b id="themeLabel">Tungi rejim</b>
-      </button>
       <button class="p-item" id="itemLogout" type="button"><span class="pi-icon">🚪</span><b>Chiqish</b><span class="pi-arrow">›</span></button>
     </div>
   </section>
+</div>
+
+<!-- ================= FILM PLEYER ================= -->
+<div class="player-bg" id="filmPlayerBg" hidden>
+  <div class="player-box" role="dialog" aria-modal="true" aria-labelledby="filmPlayerTitle">
+    <div class="player-head">
+      <b id="filmPlayerTitle">Film</b>
+    </div>
+    <div class="player-frame"><iframe id="filmPlayerFrame" title="Film" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    <div class="player-foot">
+      <button class="pf-seen" id="filmSeenBtn" type="button">✓ Ko‘rildi deb belgilash</button>
+      <a class="pf-yt" id="filmYtLink" href="#" target="_blank" rel="noopener">YouTube’da ochish →</a>
+      <button class="pf-close" id="filmCloseBtn" type="button">Yopish</button>
+    </div>
+  </div>
 </div>
 
 <!-- ================= TO'LOV OYNASI ================= -->
@@ -480,9 +615,8 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
 <nav class="nav">
   <div class="nav-inner">
     <button data-view="home" class="active"><i>🏠</i>Bosh sahifa</button>
-    <button data-view="lessons"><i>📘</i>Darslar</button>
-    <button data-view="words"><i>🅰️</i>So‘zlar</button>
-    <button data-view="practice"><i>✅</i>Mashq</button>
+    <button data-view="films"><i>🎬</i>Filmlar</button>
+    <button data-view="reyting"><i>🏆</i>Reyting</button>
     <button data-view="profile"><i>👤</i>Profil</button>
   </div>
 </nav>
@@ -516,12 +650,17 @@ function paintUser() {
 }
 
 function paintJourney() {
-  const done = progress.completedDays.length;
+  const completedDays = Array.isArray(progress.completedDays) ? progress.completedDays : [];
+  const done = completedDays.length;
+  const trialFeature = el('trialFeature');
+  // Sinov darsi birinchi dars yakunlangach bosh sahifadan butunlay olib tashlanadi.
+  if (trialFeature) trialFeature.hidden = Boolean(progress.trialDone || completedDays.includes(1));
   const total = progress.totalDays || TOTAL_DAYS;
   const percent = Math.round((done / total) * 100);
   el('journeyFill').style.width = percent + '%';
   el('journeyDays').textContent = done + ' / ' + total + ' kun';
   el('journeyPct').textContent = percent + '%';
+  renderLessonList();
 }
 
 function paintPremium() {
@@ -561,182 +700,208 @@ function paintProfile() {
   paintPremium();
 }
 
-// ---------- Darslar ma'lumoti ----------
-const lessons = [
-  { icon: '💬', title: 'Salomlashish', level: 'A1 · 1-dars' },
-  { icon: '🤝', title: 'Kundalik tanishuv', level: 'A1 · 2-dars' },
-  { icon: '☕', title: 'Kafe va buyurtma', level: 'A1 · 3-dars' },
-  { icon: '👨‍👩‍👧', title: 'Oila', level: 'A1 · 4-dars' },
-];
-const lessonHtml = (l) =>
-  `<div class="lesson"><span class="l-icon">${l.icon}</span><span class="l-body"><b>${l.title}</b><small>${l.level}</small></span><span class="l-arrow">›</span></div>`;
-el('lessonList').innerHTML = lessons.slice(0, 2).map(lessonHtml).join('');
-el('lessonsFull').innerHTML = lessons.map(lessonHtml).join('');
-
-// ---------- So'zlar: juftlikni topish ----------
-const WORD_PAIRS = [
-  ['Hallo', 'Salom'],
-  ['Danke', 'Rahmat'],
-  ['das Wasser', 'suv'],
-  ['die Familie', 'oila'],
-  ['der Freund', 'do‘st'],
-  ['Guten Abend', 'Xayrli kech'],
-];
-function shuffledIndices(n) {
-  const arr = Array.from({ length: n }, (_, i) => i);
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-function renderWordsGame() {
-  const deBox = document.getElementById('wordsDe');
-  const uzBox = document.getElementById('wordsUz');
-  deBox.innerHTML = '';
-  uzBox.innerHTML = '';
-  wordsGameState = { dePick: null, uzPick: null, matched: 0 };
-  for (const i of shuffledIndices(WORD_PAIRS.length)) {
-    deBox.insertAdjacentHTML('beforeend', `<button type="button" class="chip" data-pair="${i}">${WORD_PAIRS[i][0]}</button>`);
-  }
-  for (const i of shuffledIndices(WORD_PAIRS.length)) {
-    uzBox.insertAdjacentHTML('beforeend', `<button type="button" class="chip" data-pair="${i}">${WORD_PAIRS[i][1]}</button>`);
-  }
-  const feedback = document.getElementById('wordsFeedback');
-  if (feedback) { feedback.textContent = ''; feedback.className = 'practice-feedback'; }
-  deBox.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => onWordChip(c, 'de')));
-  uzBox.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => onWordChip(c, 'uz')));
-}
-let wordsGameState = { dePick: null, uzPick: null, matched: 0 };
-function onWordChip(chip, lang) {
-  if (chip.classList.contains('matched')) return;
-  const other = lang === 'de' ? 'uzPick' : 'dePick';
-  const key = lang === 'de' ? 'dePick' : 'uzPick';
-  const feedback = document.getElementById('wordsFeedback');
-  if (wordsGameState[key] === chip) {
-    chip.classList.remove('picked');
-    wordsGameState[key] = null;
-    return;
-  }
-  if (wordsGameState[key]) wordsGameState[key].classList.remove('picked');
-  wordsGameState[key] = chip;
-  chip.classList.add('picked');
-  if (!wordsGameState[other]) return;
-  // ikkala tomon tanlangan — tekshiramiz
-  const match = wordsGameState.dePick.dataset.pair === wordsGameState.uzPick.dataset.pair;
-  const a = wordsGameState.dePick, b = wordsGameState.uzPick;
-  if (match) {
-    a.classList.remove('picked'); b.classList.remove('picked');
-    a.classList.add('matched'); b.classList.add('matched');
-    wordsGameState.dePick = null; wordsGameState.uzPick = null;
-    wordsGameState.matched++;
-    if (wordsGameState.matched === WORD_PAIRS.length) {
-      feedback.textContent = 'Barcha juftliklar topildi! Barakalla 🎉';
-      feedback.className = 'practice-feedback ok';
-    } else {
-      feedback.textContent = 'To‘g‘ri! Davom eting…';
-      feedback.className = 'practice-feedback ok';
-    }
-  } else {
-    a.classList.add('matched-flash-err'); b.classList.add('matched-flash-err');
-    feedback.textContent = 'Noto‘g‘ri juftlik — qayta urinib ko‘ring.';
-    feedback.className = 'practice-feedback err';
-    setTimeout(() => {
-      [a, b].forEach((c) => c.classList.remove('picked', 'matched-flash-err'));
-    }, 600);
-    wordsGameState.dePick = null; wordsGameState.uzPick = null;
-  }
-}
-document.getElementById('wordsReset').addEventListener('click', renderWordsGame);
-renderWordsGame();
-
-// ---------- Mashq: gapni to'g'ri tartibga qo'ying ----------
-const EXERCISE = {
-  hint: 'Men bugun nemis tilini o‘rganyapman',
-  answer: ['Ich', 'lerne', 'heute', 'Deutsch'],
-};
-let exerciseChosen = [];
-const shuffledExerciseWords = ['heute', 'Ich', 'Deutsch', 'lerne'];
-
-function shuffleExercise() {
-  exerciseChosen = [];
-  const bank = document.getElementById('wordBank');
-  bank.innerHTML = shuffledExerciseWords.map((w) =>
-    `<button type="button" class="chip" data-word="${w}">${w}</button>`
+// ---------- Davom eting: keyingi ikkita kun ----------
+function renderLessonList() {
+  const all = window.DAY_LESSONS || [];
+  if (!all.length) return;
+  const done = Array.isArray(progress.completedDays) ? progress.completedDays : [];
+  const upcoming = all.filter((l) => !done.includes(l.n)).slice(0, 2);
+  const items = upcoming.length ? upcoming : all.slice(-2);
+  el('lessonList').innerHTML = items.map((l) =>
+    `<a class="lesson" href="day.html?day=${l.n}"><span class="l-icon">${l.icon}</span><span class="l-body"><b>${l.title.split(' — ')[0]}</b><small>${l.n}-kun</small></span><span class="l-arrow">›</span></a>`
   ).join('');
-  bank.querySelectorAll('.chip').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      if (chip.classList.contains('selected')) return;
-      chip.classList.add('selected');
-      exerciseChosen.push(chip.dataset.word);
-      renderPracticeAnswer();
-    });
-  });
-  const feedback = document.getElementById('practiceFeedback');
-  feedback.textContent = '';
-  feedback.className = 'practice-feedback';
-  renderPracticeAnswer();
 }
 
-function renderPracticeAnswer() {
-  const box = document.getElementById('answerBox');
-  if (exerciseChosen.length === 0) {
-    box.innerHTML = '<span class="practice-placeholder">So‘zlarni tanlang…</span>';
-  } else {
-    box.innerHTML = exerciseChosen.map((w) =>
-      `<button type="button" class="chip" data-word="${w}">${w}</button>`
-    ).join('');
-    box.querySelectorAll('.chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        // tanlangan so'zni bankka qaytaramiz
-        const idx = exerciseChosen.lastIndexOf(chip.dataset.word);
-        exerciseChosen.splice(idx, 1);
-        document.querySelectorAll(`#wordBank .chip[data-word="${chip.dataset.word}"]`).forEach((c) => c.classList.remove('selected'));
-        renderPracticeAnswer();
-      });
-    });
-  }
-  const feedback = document.getElementById('practiceFeedback');
-  if (feedback && feedback.classList.contains('ok')) {
-    feedback.textContent = '';
-    feedback.className = 'practice-feedback';
-  }
-}
+// ---------- Filmlar (nemis tilini filmlardan o'rganish) ----------
+const FILMS = [
+  { title: 'Nicos Weg — A1: Der ganze Film', level: 'A1', time: '1:43', poster: 'f-gold', icon: '🧭',
+    kind: 'video', id: '4-eDoThe6qo',
+    desc: 'Nico Ispaniyadan Germaniyaga keladi — sumkasi yo‘qolgan. Boshlang‘ich daraja uchun tayyorlangan bepul film.' },
+  { title: 'Nicos Weg — A2: The Movie', level: 'A2', time: '1:35', poster: 'f-red', icon: '🚲',
+    kind: 'video', id: 'Lg5P2w_Ro1c',
+    desc: 'Nico endi velosiped do‘konida ishlaydi. Kundalik hayot, ish va do‘stlar mavzusidagi dialoglar.' },
+  { title: 'Nicos Weg — B1: The Movie', level: 'B1', time: '1:40', poster: 'f-teal', icon: '🛠️',
+    kind: 'video', id: 'LkufozluseI',
+    desc: 'Nico o‘z ustaxonasini ochadi. Ish joyi, stress va rejalar — o‘rta daraja uchun.' },
+  { title: 'Harry — Gefangen in der Zeit (100 qism)', level: 'A1–A2', time: '12:00', poster: 'f-violet', icon: '⏰',
+    kind: 'playlist', id: 'PLs7zUO7VPyJ6Ufol7Z4FfkCviaETvl3c8',
+    desc: 'Zamon sayohatchi Harry bilan nemis tilini o‘rganing — 100 ta qisqa, oson tushuniladigan animatsion seriya.' },
+  { title: 'Jojo sucht das Glück (3 fasl)', level: 'B1', time: '33 qism × 3', poster: 'f-ocean', icon: '💃',
+    kind: 'playlist', id: 'PLs7zUO7VPyJ5q8vaO9vohSzNntbYvItJR',
+    desc: 'Jojo Braziliyadan kelgan qiz — sevgi, intizom va nemis tili. O‘rganuvchilar uchun telenovela.' },
+  { title: 'Das Deutschlandlabor (20 qism)', level: 'A2', time: '20 qism', poster: 'f-green', icon: '🇩🇪',
+    kind: 'playlist', id: 'PLs7zUO7VPyJ50sTVsDgfJV6_B3rFYtbFu',
+    desc: 'Germaniya haqidagi haqiqatlarni hazil-mutoyiba bilan o‘rganing — har qism 5 daqiqa.' },
+  { title: 'Ticket nach Berlin', level: 'B2', time: '6 qism', poster: 'f-slate', icon: '🚆',
+    kind: 'playlist', id: 'PLs7zUO7VPyJ4d4Qrm14DUNGjW0TX_LXQn',
+    desc: 'Oltita yosh nemis tilini o‘rganayotgan yoshlar Germaniya bo‘ylab sayohat qiladi — madaniyat va til.' },
+];
+const FILM_SEEN_KEY = 'sprichdeFilmsSeen';
 
-document.getElementById('resetPractice').addEventListener('click', shuffleExercise);
-document.getElementById('checkPractice').addEventListener('click', () => {
-  const feedback = document.getElementById('practiceFeedback');
-  const ok = exerciseChosen.length === EXERCISE.answer.length
-    && exerciseChosen.every((w, i) => w === EXERCISE.answer[i]);
-  if (ok) {
-    feedback.textContent = 'To‘g‘ri! Barakalla 🎉';
-    feedback.className = 'practice-feedback ok';
-  } else {
-    feedback.textContent = 'Noto‘g‘ri tartib — qayta urinib ko‘ring.';
-    feedback.className = 'practice-feedback err';
-  }
+function loadSeenFilms() {
+  try { const v = JSON.parse(localStorage.getItem(FILM_SEEN_KEY)); return Array.isArray(v) ? v : []; }
+  catch { return []; }
+}
+function saveSeenFilms(list) {
+  try { localStorage.setItem(FILM_SEEN_KEY, JSON.stringify(list)); } catch {}
+}
+function filmEmbedUrl(film) {
+  return film.kind === 'playlist'
+    ? 'https://www.youtube.com/embed/videoseries?list=' + film.id
+    : 'https://www.youtube.com/embed/' + film.id;
+}
+function filmYoutubeUrl(film) {
+  return film.kind === 'playlist'
+    ? 'https://www.youtube.com/playlist?list=' + film.id
+    : 'https://www.youtube.com/watch?v=' + film.id;
+}
+function renderFilms() {
+  const box = el('filmList');
+  if (!box) return;
+  const seen = loadSeenFilms();
+  box.innerHTML = FILMS.map((film, i) => `
+    <button type="button" class="film" data-film="${i}" aria-label="${film.title} filmini ko‘rish">
+      <span class="film-poster ${film.poster}"><i>${film.icon}</i><small>${film.level}</small></span>
+      <span class="film-body"><b>${film.title}</b><small>${film.desc}</small>
+        <span class="film-meta"><span class="film-level">${film.level}</span><span class="film-time">⏱ ${film.time}</span>${seen.includes(i) ? '<span class="film-seen">✓ Ko‘rildi</span>' : ''}</span>
+      </span>
+    </button>`).join('');
+  box.querySelectorAll('[data-film]').forEach((btn) => btn.addEventListener('click', () => openFilm(Number(btn.dataset.film))));
+}
+let currentFilm = null;
+function openFilm(index) {
+  const film = FILMS[index];
+  if (!film) return;
+  currentFilm = index;
+  el('filmPlayerTitle').textContent = film.title;
+  el('filmPlayerFrame').src = filmEmbedUrl(film) + '?autoplay=1&rel=0';
+  el('filmYtLink').href = filmYoutubeUrl(film);
+  const seen = loadSeenFilms().includes(index);
+  el('filmSeenBtn').textContent = seen ? '✓ Ko‘rilgan (bekor qilish)' : '✓ Ko‘rildi deb belgilash';
+  el('filmPlayerBg').hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeFilm() {
+  el('filmPlayerFrame').src = 'about:blank';
+  el('filmPlayerBg').hidden = true;
+  document.body.style.overflow = '';
+  currentFilm = null;
+  renderFilms();
+}
+el('filmCloseBtn').addEventListener('click', closeFilm);
+el('filmPlayerBg').addEventListener('click', (e) => { if (e.target === el('filmPlayerBg')) closeFilm(); });
+el('filmSeenBtn').addEventListener('click', () => {
+  if (currentFilm === null) return;
+  const seen = loadSeenFilms();
+  const next = seen.includes(currentFilm) ? seen.filter((i) => i !== currentFilm) : [...seen, currentFilm];
+  saveSeenFilms(next);
+  el('filmSeenBtn').textContent = next.includes(currentFilm) ? '✓ Ko‘rilgan (bekor qilish)' : '✓ Ko‘rildi deb belgilash';
 });
-shuffleExercise();
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !el('filmPlayerBg').hidden) closeFilm();
+});
+renderFilms();
+
+// ---------- Reyting (liderlar jadvali) ----------
+async function loadReyting() {
+  const loading = el('reytingLoading');
+  const content = el('reytingContent');
+  try {
+    loading.hidden = false;
+    content.hidden = true;
+    const data = await authFetch('/api/leaderboard');
+    paintReyting(data);
+    loading.hidden = true;
+    content.hidden = false;
+  } catch (err) {
+    loading.textContent = 'Reyting yuklanmadi: ' + err.message;
+    loading.hidden = false;
+  }
+}
+const avatarColors = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6'];
+function avatarClass(name) {
+  let h = 0;
+  for (const ch of String(name || '?')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return avatarColors[h % avatarColors.length];
+}
+function initialsOf(name) {
+  const parts = String(name || '?').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  return parts.slice(0, 2).map((p) => p[0].toUpperCase()).join('');
+}
+function reytRow(e) {
+  const medal = e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : e.rank === 3 ? '🥉' : e.rank;
+  const rankCls = e.rank <= 3 ? 'reyt-rank medal' : 'reyt-rank';
+  return '<div class="reyt-row' + (e.isMe ? ' me' : '') + '">'
+    + '<span class="' + rankCls + '">' + medal + '</span>'
+    + '<span class="reyt-avatar ' + avatarClass(e.name) + '">' + initialsOf(e.name) + '</span>'
+    + '<span class="reyt-name">' + e.name + (e.isMe ? '<span class="reyt-me-chip">SIZ</span>' : '') + '</span>'
+    + '<span class="reyt-row-info"><b>' + e.points + ' ball</b><small>' + e.days + ' kun</small></span>'
+    + '</div>';
+}
+function paintReyting(data) {
+  const me = data.me || { rank: 0, days: 0, points: 0, name: '' };
+  el('reytMyRank').textContent = '#' + (me.rank || '–');
+  el('reytOfTotal').textContent = 'jami ' + (data.totalStudents || 0) + ' o‘quvchidan';
+  el('reytMedal').textContent = me.rank === 1 ? '🥇' : me.rank === 2 ? '🥈' : me.rank === 3 ? '🥉' : '🏅';
+  el('reytMyDays').textContent = me.days || 0;
+  el('reytMyPoints').textContent = me.points || 0;
+  const diff = Math.round(((me.points || 0) - (data.average || 0)) * 10) / 10;
+  el('reytMyAvg').textContent = (diff >= 0 ? '+' : '') + diff;
+  el('reytMyAvatar').textContent = initialsOf(me.name);
+  el('reytMyAvatar').className = 'reyt-avatar reyt-avatar-lg ' + avatarClass(me.name);
+  el('reytMyName').textContent = 'Siz (' + (me.name || 'O‘quvchi') + ')';
+  el('reytAvg').textContent = data.average ?? '–';
+  el('reytAvgInline').textContent = data.average ?? '–';
+  el('reytTotal').textContent = (data.totalStudents || 0) + ' ta';
+  el('reytDays').textContent = me.days || 0;
+  const rank = me.rank || 0;
+  const above = (data.top || []).filter((e) => e.rank < rank).sort((a, b) => b.rank - a.rank)[0];
+  if (!rank || rank <= 1 || !above) {
+    el('reytToNext').textContent = '🏆 1-o‘rin';
+    el('reytBeAbove').textContent = '0';
+    el('reytFill').style.width = '100%';
+  } else {
+    const gap = above.points - (me.points || 0) + 1;
+    el('reytToNext').textContent = gap + ' ball';
+    el('reytBeAbove').textContent = gap;
+    el('reytFill').style.width = Math.min(100, Math.round(((me.points || 0) / above.points) * 100)) + '%';
+  }
+  const list = el('reytList');
+  const topHtml = (data.top || []).map(reytRow).join('');
+  const meInTop = (data.top || []).some((e) => e.isMe);
+  const meHtml = meInTop ? '' : '<div class="reyt-sep">· · ·</div>' + reytRow(Object.assign({}, me, { isMe: true }));
+  list.innerHTML = (data.top && data.top.length
+    ? topHtml + meHtml
+    : '<div class="reyt-list-empty">Hozircha hech kim o‘rganmagan — birinchi bo‘ling!</div>');
+}
 
 // ---------- Navigatsiya ----------
+function openProfileView() {
+  const profileButton = document.querySelector('.nav button[data-view="profile"]');
+  if (profileButton) profileButton.click();
+}
+el('userAvatar').addEventListener('click', openProfileView);
+
 document.querySelectorAll('.nav button').forEach((btn) => btn.addEventListener('click', () => {
   document.querySelectorAll('.nav button').forEach((b) => b.classList.toggle('active', b === btn));
   const view = btn.dataset.view;
   document.querySelectorAll('.page-view').forEach((v) => { v.hidden = v.id !== 'view-' + view; });
+  if (view === 'reyting') loadReyting();
   window.scrollTo({ top: 0 });
 }));
 el('seeAllLessons').addEventListener('click', (e) => {
   e.preventDefault();
-  document.querySelector('.nav button[data-view="lessons"]').click();
+  location.href = 'journey.html';
 });
 
-// ---------- Yorug'/Tungi rejim (faqat profil ichida) ----------
+// ---------- Yorug'/Tungi rejim (qalamcha yonidagi tugma) ----------
 function paintTheme() {
   if (!window.SolTheme) return;
   const dark = SolTheme.current() === 'dark';
-  el('themeLabel').textContent = dark ? 'Kunduzgi rejim' : 'Tungi rejim';
   el('themeIcon').textContent = dark ? '☀️' : '🌙';
   el('itemTheme').title = dark ? 'Kunduzgi rejimga o‘tish' : 'Tungi rejimga o‘tish';
+  el('itemTheme').setAttribute('aria-label', el('itemTheme').title);
 }
 el('itemTheme').addEventListener('click', () => {
   if (window.SolTheme) SolTheme.toggle();
@@ -920,28 +1085,8 @@ el('paySubmit').addEventListener('click', async () => {
   });
 })();
 
-// ---------- Profil: chiqish, parol, ism ----------
+// ---------- Profil: chiqish va ism ----------
 el('itemLogout').addEventListener('click', logout);
-
-el('itemPassword').addEventListener('click', async () => {
-  const current = prompt('Joriy parolingizni kiriting:');
-  if (current === null) return;
-  const next = prompt('Yangi parolni kiriting (kamida 6 belgi):');
-  if (next === null) return;
-  if (next.length < 6) {
-    alert('Yangi parol kamida 6 belgidan iborat bo‘lsin.');
-    return;
-  }
-  try {
-    await authFetch('/api/me/password', {
-      method: 'POST',
-      body: JSON.stringify({ currentPassword: current, newPassword: next }),
-    });
-    alert('Parol muvaffaqiyatli o‘zgartirildi.');
-  } catch (err) {
-    alert(err.message);
-  }
-});
 
 el('editProfileBtn').addEventListener('click', async () => {
   const value = prompt('Yangi ism-familiyani kiriting:', profile?.fullName || '');
@@ -977,6 +1122,15 @@ el('editProfileBtn').addEventListener('click', async () => {
   await Promise.all([loadProgress(), loadPaymentInfo(), loadPayments()]);
   paintJourney();
   paintProfile();
+
+  // ?pay=1 — masalan, qulflangan kunni bosganda to'lov oynasini ochadi
+  try {
+    if (new URLSearchParams(location.search).get('pay') === '1') {
+      openProfileView();
+      openPayment();
+      history.replaceState(null, '', 'app.html');
+    }
+  } catch {}
 })();
 
 </script>

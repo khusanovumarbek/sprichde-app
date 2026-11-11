@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fc">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1b33">
+<title>SprichDe · Kun darsi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<script src="lessons-data.js"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="application-name" content="SprichDe">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SprichDe">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<script src="pwa.js" defer></script>
+<link rel="stylesheet" href="theme.css">
+<style>
+:root{font-family:Inter,"Segoe UI",Arial,sans-serif;--blue:var(--primary);--blue-dark:var(--primary-2);--muted:#788196;--line:#e9ebf2;--soft:#e7efff;--shadow:0 10px 26px #1d2b4b0f}
+html{overflow-x:hidden}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x:hidden}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right));position:sticky;top:0;z-index:5}
+.back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px;text-decoration:none;color:var(--text)}
+.topbar b{font-size:16px;font-weight:800}
+.wrap{max-width:520px;margin:0 auto;padding:22px 20px 60px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
+
+/* ---------- Kun sarlavhasi ---------- */
+.intro{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+.intro small{font-size:10.5px;font-weight:800;letter-spacing:2px;color:#ffffffcc}
+.intro b{display:block;font-size:21px;font-weight:800;margin-top:6px;line-height:1.25;overflow-wrap:anywhere}
+.intro p{margin:6px 0 0;font-size:12.5px;color:#ffffffd9}
+.d-state-pill{display:inline-block;margin-top:12px;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;background:#ffffff2e;border:1px solid #ffffff45;color:#fff}
+
+/* ---------- Modul kartasi ---------- */
+.mod{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.mod-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.mod-icon{width:44px;height:44px;flex:none;border-radius:13px;background:var(--soft);display:grid;place-items:center;font-size:20px}
+.mod-head b{font-size:15px;font-weight:800;display:block}
+.mod-head small{font-size:11px;color:var(--muted);display:block;margin-top:2px}
+.mod-body{font-size:13.5px;line-height:1.65}
+.vocab{display:grid;gap:9px}
+.vocab-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-size:13px}
+.vocab-main{flex:1;min-width:0}
+.vocab-main b{display:block;font-weight:700}
+.vocab-main span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.vocab-voice{display:flex;flex-direction:column;gap:4px;align-items:center;flex:none}
+.voice-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:15px;cursor:pointer;display:grid;place-items:center;padding:0}
+.voice-btn:active{transform:scale(.9)}
+.voice-btn:disabled{opacity:.6}
+.voice-result{min-height:14px;font-size:9px;font-weight:800;text-align:center;line-height:1.25;max-width:110px}
+.voice-result.ok{color:#1d7a44}
+.voice-result.err{color:#d2453c}
+.voice-result.heard{color:var(--muted)}
+.voice-box .voice-btn{width:40px;height:40px;font-size:17px}
+.voice-row{padding:12px 14px}
+
+/* ---------- Gramatika ---------- */
+.grammar-rule{font-size:15px;font-weight:800;margin-bottom:2px}
+.grammar-form{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--soft-2);border-radius:10px;padding:9px 12px;margin-bottom:12px;overflow-wrap:anywhere}
+.grammar-example{border-left:3px solid var(--blue);background:var(--surface-2);border-radius:0 12px 12px 0;padding:10px 12px;margin-bottom:12px}
+.ex-de{font-size:14.5px;font-weight:800}
+.ex-uz{font-size:11.5px;color:var(--muted);margin-top:2px}
+.grammar-options{display:grid;gap:8px;margin-bottom:10px}
+.g-option{text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--text);border-radius:12px;padding:11px 13px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.g-option:active{transform:scale(.99)}
+.g-option.correct{border-color:#1d7a44;background:#e7f6ec;color:#1d7a44}
+html[data-theme="dark"] .g-option.correct{background:#1d3a28;color:#57d18a;border-color:#57d18a}
+.g-option.wrong{border-color:#d2453c;background:#fdecea;color:#d2453c}
+html[data-theme="dark"] .g-option.wrong{background:#3a1d1d;color:#f28b82;border-color:#f28b82}
+.g-option:disabled{cursor:default}
+
+/* ---------- So'zlar (juftlik) ---------- */
+.practice-hint{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.words-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.words-col{display:grid;gap:8px}
+.practice-answer{min-height:56px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1.5px dashed var(--line);border-radius:14px;padding:10px;background:var(--surface-2);margin-bottom:12px}
+.practice-placeholder{color:var(--muted);font-size:13px;margin:0 auto}
+.practice-bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 15px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,border-color .15s,opacity .15s;max-width:100%;overflow-wrap:anywhere}
+.chip:active{transform:scale(.94)}
+.chip.selected{border-color:var(--blue);opacity:.65}
+.chip.picked{border-color:var(--blue);box-shadow:0 0 0 2px var(--soft)}
+.chip.matched{border-color:#1d7a44;background:#e7f6ec;color:#1d7a44;pointer-events:none}
+html[data-theme="dark"] .chip.matched{background:#1d3a28;color:#57d18a;border-color:#57d18a}
+.chip.matched-flash-err{border-color:#d2453c;background:#fdecea;color:#d2453c}
+html[data-theme="dark"] .chip.matched-flash-err{background:#3a1d1d;color:#f28b82}
+#wordsReset{width:100%;margin-top:4px}
+.practice-feedback{min-height:22px;font-size:14px;font-weight:800;margin-bottom:10px;line-height:1.4}
+.practice-feedback.ok{color:#1d7a44}
+.practice-feedback.err{color:#d2453c}
+.practice-actions{display:flex;gap:10px}
+.practice-btn{height:48px;border:0;border-radius:13px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.practice-reset{flex:1;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.practice-check{flex:1.5;background:var(--blue);color:#fff}
+.practice-check:disabled{opacity:.5;cursor:not-allowed}
+
+/* ---------- N-kunni tugatdim tugmasi ---------- */
+.done-btn{width:100%;height:54px;margin-top:18px;border:0;border-radius:16px;background:var(--blue);color:#fff;font:inherit;font-size:15px;font-weight:800;cursor:pointer;box-shadow:var(--shadow)}
+.done-btn:hover{background:var(--blue-dark)}
+.done-btn:disabled{opacity:.7;cursor:default}
+.done-btn.done{background:#1d7a44}
+.note{margin-top:16px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
+
+/* Juda kichik telefonlar (iPhone SE va sh.k.) */
+@media (max-width: 380px){
+  .wrap{padding-top:16px;padding-left:max(14px, env(safe-area-inset-left));padding-right:max(14px, env(safe-area-inset-right))}
+  .topbar{padding-left:max(14px, env(safe-area-inset-left));padding-right:max(14px, env(safe-area-inset-right))}
+  .topbar b{font-size:14.5px}
+  .intro{padding:17px;border-radius:18px}
+  .intro b{font-size:18px}
+  .mod{padding:14px;border-radius:16px}
+  .words-card,.words-grid{gap:8px}
+  .chip{font-size:12.5px;padding:8px 10px}
+  .vocab-row{font-size:12.5px;padding:9px 10px}
+}
+
+/* Gorizontal (landshaft) rejim — balandlik kam bo'lganda */
+@media (max-height: 480px) and (orientation: landscape){
+  .wrap{padding-top:14px;padding-bottom:40px}
+  .topbar{height:52px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="back" href="journey.html" aria-label="Sayohatga qaytish">←</a>
+  <b id="topTitle">Gramatika · Lug‘at · Mashq</b>
+</header>
+
+<div class="wrap">
+  <!-- ================= KUN SARLAVHASI ================= -->
+  <div class="intro">
+    <small id="dayEyebrow">1-KUN</small>
+    <b id="dayTitle">Salomlashish</b>
+    <p id="daySub">Gramatikani yodlang, so‘zlarni aytib mashq qiling va mashqni bajaring.</p>
+    <span class="d-state-pill" id="dayState">Yopiq</span>
+  </div>
+
+    <!-- ================= 1. GRAMATIKA ================= -->
+  <div class="mod">
+    <div class="mod-head">
+      <span class="mod-icon">📐</span>
+      <span><b>Gramatika</b><small>Qoida va grammatik mashq</small></span>
+    </div>
+    <div class="grammar-rule" id="grammarRule"></div>
+    <div class="grammar-form" id="grammarForm"></div>
+    <div class="grammar-example">
+      <div class="ex-de" id="grammarExDe"></div>
+      <div class="ex-uz" id="grammarExUz"></div>
+    </div>
+    <div class="practice-hint">Bo'sh joyni to'ldiring: <b id="grammarQuestion"></b></div>
+    <div class="grammar-options" id="grammarOptions"></div>
+    <div class="practice-feedback" id="grammarFeedback" role="status" aria-live="polite"></div>
+  </div>
+
+  <!-- ================= 2. LUG'AT ================= -->
+  <div class="mod">
+    <div class="mod-head">
+      <span class="mod-icon">📚</span>
+      <span><b>Lug'at</b><small>So'zlarni tinglang va gapirib mashq qiling</small></span>
+    </div>
+    <div class="practice-hint">Juftligini toping: chap ustundan nemischa so'zni, o'ng ustundan mos o'zbekcha tarjimasini tanlang. Mos juftlik to'g'ri joyiga o'tadi.</div>
+    <div class="words-grid">
+      <div class="words-col" id="wordsDe" aria-label="Nemischa"></div>
+      <div class="words-col" id="wordsUz" aria-label="O‘zbekcha"></div>
+    </div>
+    <div class="practice-feedback" id="wordsFeedback" role="status" aria-live="polite"></div>
+    <button class="practice-btn practice-reset" id="wordsReset" type="button">Qayta aralashtirish</button>
+  </div>
+
+  <!-- ================= 3. MASHQ ================= -->
+  <div class="mod">
+    <div class="mod-head">
+      <span class="mod-icon">🧩</span>
+      <span><b>Mashq</b><small>Gapni to‘g‘ri tartibga qo‘ying</small></span>
+    </div>
+    <div class="practice-hint">Tarjimasi: <b id="exerciseHint"></b><br>So‘zlarni to‘g‘ri tartibda qo‘yib gap hosil qiling:</div>
+    <div class="practice-answer" id="answerBox"><span class="practice-placeholder">So‘zlarni tanlang…</span></div>
+    <div class="practice-bank" id="wordBank"></div>
+    <div class="practice-feedback" id="practiceFeedback" role="status" aria-live="polite"></div>
+    <div class="practice-actions">
+      <button class="practice-btn practice-reset" id="resetPractice" type="button">Qayta urinish</button>
+      <button class="practice-btn practice-check" id="checkPractice" type="button">Tekshirish →</button>
+    </div>
+  </div>
+
+    <!-- ================= 4. OVOZ ================= -->
+  <div class="mod">
+    <div class="mod-head">
+      <span class="mod-icon">🎤</span>
+      <span><b>Ovoz</b><small>So‘zlarni aytib mashq qiling</small></span>
+    </div>
+    <div class="practice-hint">Avval 🔊 tugmasini bosib so‘zni tinglang, so‘ng 🎤 tugmasini bosib baland ayting. To‘g‘ri bo‘lsa “To‘g‘ri!” chiqadi.</div>
+    <div class="vocab voice-box" id="voiceList"></div>
+  </div>
+
+  <!-- ================= TUGATDIM ================= -->
+  <button class="done-btn" id="doneBtn" type="button">✓ N-kunni tugatdim</button>
+  <p class="note">Tugatganingizdan so‘ng bu kun 91 kunlik sayohatda “O‘tilgan” deb belgilanadi.</p>
+</div>
+
+<script>
+// ============================================================
+// SprichDe — kun sahifasi (91 kunlik sayohatning har bir kuni)
+// Vaqtincha bitta demo kontent takrorlanadi; keyin kunlarga
+// alohida kontent qo'shiladi.
+// ============================================================
+const TOTAL_DAYS = 91;
+
+// Kontent umumiy fayldan: lessons-data.js (91 kun)
+const FALLBACK_LESSON = {
+  title: 'Yangi dars',
+  words: [
+    ['der Freund', 'Do‘st'],
+    ['das Buch', 'Kitob'],
+    ['lernen', 'O‘rganmoq'],
+    ['die Schule', 'Maktab'],
+  ],
+  exercise: { hint: 'Men bugun nemis tilini o‘rganyapman', answer: ['Ich', 'lerne', 'heute', 'Deutsch'] },
+};
+const DAY_DATA = window.DAY_LESSONS || [];
+
+function currentDay() {
+  const raw = Number(new URLSearchParams(location.search).get('day'));
+  if (!Number.isFinite(raw) || raw < 1) return 1;
+  return Math.min(TOTAL_DAYS, Math.floor(raw));
+}
+const DAY = currentDay();
+const LESSON = DAY_DATA[DAY - 1] || FALLBACK_LESSON;
+
+// ---------- Sahifani to'ldirish ----------
+document.title = `SprichDe · ${DAY}-kun`;
+document.getElementById('topTitle').textContent = `${DAY}-kun`;
+document.getElementById('dayEyebrow').textContent = `${DAY}-KUN`;
+document.getElementById('dayTitle').textContent = LESSON.title;
+// Ovoz: har so'z uchun tinglash (TTS) va aytish mashqi
+const voiceListEl = document.getElementById('voiceList');
+voiceListEl.innerHTML = LESSON.words.map(([de, uz], i) => `
+  <div class="vocab-row voice-row">
+    <span class="vocab-main"><b>${de}</b><span>${uz}</span></span>
+    <span class="vocab-voice">
+      <button class="voice-btn" type="button" data-speak="${i}" aria-label="${de} — talaffuzni eshitish">🔊</button>
+      <button class="voice-btn" type="button" data-listen="${i}" aria-label="${de} — so'zlash">🎤</button>
+      <span class="voice-result" data-result="${i}" role="status" aria-live="polite"></span>
+    </span>
+  </div>`).join('');
+voiceListEl.querySelectorAll('[data-speak]').forEach((btn) => btn.addEventListener('click', () => speakWord(LESSON.words[Number(btn.dataset.speak)][0])));
+voiceListEl.querySelectorAll('[data-listen]').forEach((btn) => btn.addEventListener('click', () => listenWord(LESSON.words[Number(btn.dataset.listen)][0], btn, voiceListEl.querySelector('[data-result="' + btn.dataset.listen + '"]'))));
+
+// Gramatika: qoida + misol + variantlar bilan mashq
+const GRAMMAR = LESSON.grammar || {};
+document.getElementById('grammarRule').textContent = GRAMMAR.rule || '';
+document.getElementById('grammarForm').textContent = GRAMMAR.form || '';
+document.getElementById('grammarExDe').textContent = GRAMMAR.exDe || '';
+document.getElementById('grammarExUz').textContent = GRAMMAR.exUz || '';
+document.getElementById('grammarQuestion').textContent = GRAMMAR.q || '';
+const grammarOptions = document.getElementById('grammarOptions');
+grammarOptions.innerHTML = (GRAMMAR.options || []).map((opt, idx) => `<button type="button" class="g-option" data-idx="${idx}">${opt}</button>`).join('');
+grammarOptions.querySelectorAll('.g-option').forEach((btn) => btn.addEventListener('click', () => {
+  const correct = Number(btn.dataset.idx) === Number(GRAMMAR.a);
+  const feed = document.getElementById('grammarFeedback');
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  if (correct) {
+    feed.textContent = 'To‘g‘ri! Ajoyib 🎉';
+    feed.className = 'practice-feedback ok';
+    grammarOptions.querySelectorAll('.g-option').forEach((b) => { b.disabled = true; });
+  } else {
+    feed.textContent = 'Noto‘g‘ri — qayta urinib ko‘ring';
+    feed.className = 'practice-feedback err';
+    btn.disabled = true;
+  }
+}));
+
+// Ovozli funksiya: talaffuzni eshitish (Speech Synthesis) va aytishni tekshirish (Speech Recognition)
+function speakWord(text) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'de-DE';
+  utter.rate = 0.9;
+  const voices = synth.getVoices();
+  const deVoice = voices.find((v) => /de(-|_)DE/i.test(v.lang)) || voices.find((v) => /^de/i.test(v.lang));
+  if (deVoice) utter.voice = deVoice;
+  synth.cancel();
+  synth.speak(utter);
+}
+if (window.speechSynthesis) window.speechSynthesis.getVoices();
+
+const normText = (value) => String(value || '').toLowerCase().replace(/[^a-züäöß ]/g, ' ').replace(/\s+/g, ' ').trim();
+const similarity = (a, b) => {
+  const A = a.split(' ').filter(Boolean);
+  const B = b.split(' ').filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const inB = B.filter((w) => A.includes(w)).length;
+  return inB / Math.max(A.length, B.length);
+};
+function listenWord(target, btn, resultEl) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const icon = '🎤';
+  if (!SR) {
+    resultEl.textContent = 'Chrome’dan foydalaning — brauzer ovoz tanishni qo‘llab-quvvatlamaydi';
+    resultEl.className = 'voice-result err';
+    return;
+  }
+  const rec = new SR();
+  rec.lang = 'de-DE';
+  rec.interimResults = false;
+  rec.maxAlternatives = 5;
+  btn.disabled = true;
+  btn.textContent = '🎙';
+  resultEl.textContent = 'Tinglayapman…';
+  resultEl.className = 'voice-result heard';
+  rec.onresult = (event) => {
+    const alts = Array.from(event.results[0] || []).map((r) => r.transcript);
+    const targetN = normText(target);
+    const ok = alts.some((alt) => {
+      const altN = normText(alt);
+      return altN === targetN || similarity(altN, targetN) >= 0.75;
+    });
+    resultEl.textContent = ok ? 'To‘g‘ri! Barakalla 🎉' : 'Noto‘g‘ri — qayta urinib ko‘ring';
+    resultEl.className = 'voice-result ' + (ok ? 'ok' : 'err');
+    btn.disabled = false;
+    btn.textContent = icon;
+  };
+  rec.onerror = (event) => {
+    const messages = {
+      'not-allowed': 'Mikrofonga ruxsat bering',
+      'no-speech': 'Ovoz eshitilmadi — qayta urinib ko‘ring',
+      'audio-capture': 'Mikrofon topilmadi',
+      'network': 'Tarmoq xatosi — qayta urinib ko‘ring',
+    };
+    resultEl.textContent = messages[event.error] || 'Ovoz tanilmadi — qayta urinib ko‘ring';
+    resultEl.className = 'voice-result err';
+    btn.disabled = false;
+    btn.textContent = icon;
+  };
+  rec.onend = () => { btn.disabled = false; btn.textContent = icon; };
+  try { rec.start(); } catch {}
+}
+const doneBtn = document.getElementById('doneBtn');
+doneBtn.textContent = `✓ ${DAY}-kunni tugatdim`;
+document.getElementById('exerciseHint').textContent = '“' + ((LESSON.exercise && LESSON.exercise.hint) || '') + '”';
+
+// ---------- So'zlar: juftlikni topish ----------
+// Bugungi so'zlar + oldingi kunlardan 2 ta takror so‘z (jami 6 juftlik)
+function buildPairs() {
+  const pairs = (LESSON.words || []).map(([de, uz]) => [de, uz]);
+  for (let i = DAY - 2; i >= 0 && pairs.length < 6; i--) {
+    for (const [de, uz] of ((window.DAY_LESSONS || [])[i]?.words || [])) {
+      if (pairs.length >= 6) break;
+      if (!pairs.some(([a]) => a === de)) pairs.unshift([de, uz]);
+    }
+  }
+  return pairs;
+}
+const WORD_PAIRS = buildPairs();
+function shuffledIndices(n) {
+  const arr = Array.from({ length: n }, (_, i) => i);
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+let wordsGameState = { dePick: null, uzPick: null, matched: 0 };
+function renderWordsGame() {
+  const deBox = document.getElementById('wordsDe');
+  const uzBox = document.getElementById('wordsUz');
+  deBox.innerHTML = '';
+  uzBox.innerHTML = '';
+  wordsGameState = { dePick: null, uzPick: null, matched: 0 };
+  for (const i of shuffledIndices(WORD_PAIRS.length)) {
+    deBox.insertAdjacentHTML('beforeend', `<button type="button" class="chip" data-pair="${i}">${WORD_PAIRS[i][0]}</button>`);
+  }
+  for (const i of shuffledIndices(WORD_PAIRS.length)) {
+    uzBox.insertAdjacentHTML('beforeend', `<button type="button" class="chip" data-pair="${i}">${WORD_PAIRS[i][1]}</button>`);
+  }
+  const feedback = document.getElementById('wordsFeedback');
+  if (feedback) { feedback.textContent = ''; feedback.className = 'practice-feedback'; }
+  deBox.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => onWordChip(c, 'de')));
+  uzBox.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => onWordChip(c, 'uz')));
+}
+function onWordChip(chip, lang) {
+  if (chip.classList.contains('matched')) return;
+  const other = lang === 'de' ? 'uzPick' : 'dePick';
+  const key = lang === 'de' ? 'dePick' : 'uzPick';
+  const feedback = document.getElementById('wordsFeedback');
+  if (wordsGameState[key] === chip) {
+    chip.classList.remove('picked');
+    wordsGameState[key] = null;
+    return;
+  }
+  if (wordsGameState[key]) wordsGameState[key].classList.remove('picked');
+  wordsGameState[key] = chip;
+  chip.classList.add('picked');
+  if (!wordsGameState[other]) return;
+  const match = wordsGameState.dePick.dataset.pair === wordsGameState.uzPick.dataset.pair;
+  const a = wordsGameState.dePick, b = wordsGameState.uzPick;
+  if (match) {
+    a.classList.remove('picked'); b.classList.remove('picked');
+    a.classList.add('matched'); b.classList.add('matched');
+    wordsGameState.dePick = null; wordsGameState.uzPick = null;
+    wordsGameState.matched++;
+    if (wordsGameState.matched === WORD_PAIRS.length) {
+      feedback.textContent = 'Barcha juftliklar topildi! Barakalla 🎉';
+      feedback.className = 'practice-feedback ok';
+    } else {
+      feedback.textContent = 'To‘g‘ri! Davom eting…';
+      feedback.className = 'practice-feedback ok';
+    }
+  } else {
+    a.classList.add('matched-flash-err'); b.classList.add('matched-flash-err');
+    feedback.textContent = 'Noto‘g‘ri juftlik — qayta urinib ko‘ring.';
+    feedback.className = 'practice-feedback err';
+    setTimeout(() => {
+      [a, b].forEach((c) => c.classList.remove('picked', 'matched-flash-err'));
+    }, 600);
+    wordsGameState.dePick = null; wordsGameState.uzPick = null;
+  }
+}
+document.getElementById('wordsReset').addEventListener('click', renderWordsGame);
+renderWordsGame();
+
+// ---------- Mashq: gapni to'g'ri tartibga qo'ying ----------
+const EXERCISE = LESSON.exercise || { hint: '', answer: ['Ich', 'lerne', 'heute', 'Deutsch'] };
+let exerciseChosen = [];
+const shuffledExerciseWords = [...EXERCISE.answer]
+  .map((w) => [w, Math.random()])
+  .sort((a, b) => a[1] - b[1])
+  .map(([w]) => w);
+
+function shuffleExercise() {
+  exerciseChosen = [];
+  const bank = document.getElementById('wordBank');
+  bank.innerHTML = shuffledExerciseWords.map((w) =>
+    `<button type="button" class="chip" data-word="${w}">${w}</button>`
+  ).join('');
+  bank.querySelectorAll('.chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      if (chip.classList.contains('selected')) return;
+      chip.classList.add('selected');
+      exerciseChosen.push(chip.dataset.word);
+      renderPracticeAnswer();
+    });
+  });
+  const feedback = document.getElementById('practiceFeedback');
+  feedback.textContent = '';
+  feedback.className = 'practice-feedback';
+  renderPracticeAnswer();
+}
+function renderPracticeAnswer() {
+  const box = document.getElementById('answerBox');
+  if (exerciseChosen.length === 0) {
+    box.innerHTML = '<span class="practice-placeholder">So‘zlarni tanlang…</span>';
+  } else {
+    box.innerHTML = exerciseChosen.map((w) =>
+      `<button type="button" class="chip" data-word="${w}">${w}</button>`
+    ).join('');
+    box.querySelectorAll('.chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const idx = exerciseChosen.lastIndexOf(chip.dataset.word);
+        exerciseChosen.splice(idx, 1);
+        document.querySelectorAll(`#wordBank .chip[data-word="${chip.dataset.word}"]`).forEach((c) => c.classList.remove('selected'));
+        renderPracticeAnswer();
+      });
+    });
+  }
+  const feedback = document.getElementById('practiceFeedback');
+  if (feedback && feedback.classList.contains('ok')) {
+    feedback.textContent = '';
+    feedback.className = 'practice-feedback';
+  }
+}
+document.getElementById('resetPractice').addEventListener('click', shuffleExercise);
+document.getElementById('checkPractice').addEventListener('click', () => {
+  const feedback = document.getElementById('practiceFeedback');
+  const ok = exerciseChosen.length === EXERCISE.answer.length
+    && exerciseChosen.every((w, i) => w === EXERCISE.answer[i]);
+  if (ok) {
+    feedback.textContent = 'To‘g‘ri! Barakalla 🎉';
+    feedback.className = 'practice-feedback ok';
+  } else {
+    feedback.textContent = 'Noto‘g‘ri tartib — qayta urinib ko‘ring.';
+    feedback.className = 'practice-feedback err';
+  }
+});
+shuffleExercise();
+
+// ---------- Progress: kunni tugatish ----------
+const statePill = document.getElementById('dayState');
+
+function paintDayState(completedDays) {
+  const done = Array.isArray(completedDays) && completedDays.includes(DAY);
+  statePill.textContent = done ? 'O‘tilgan' : (DAY === 1 ? 'Sinov darsi' : 'Ochiq');
+  if (done) {
+    doneBtn.textContent = `✓ ${DAY}-kun o‘tilgan`;
+    doneBtn.classList.add('done');
+    doneBtn.disabled = true;
+  } else {
+    doneBtn.textContent = `✓ ${DAY}-kunni tugatdim`;
+    doneBtn.classList.remove('done');
+    doneBtn.disabled = false;
+  }
+}
+
+doneBtn.addEventListener('click', async () => {
+  if (doneBtn.disabled) return;
+  doneBtn.disabled = true;
+  doneBtn.textContent = 'Saqlanmoqda…';
+  try {
+    await authFetch('/api/progress/complete', {
+      method: 'POST',
+      body: JSON.stringify({ day: DAY }),
+    });
+    doneBtn.textContent = `✓ ${DAY}-kun o‘tilgan`;
+    doneBtn.classList.add('done');
+    statePill.textContent = 'O‘tilgan';
+  } catch (err) {
+    doneBtn.disabled = false;
+    doneBtn.textContent = `✓ ${DAY}-kunni tugatdim`;
+    alert(err.message);
+  }
+});
+
+(async function initDay() {
+  const me = await guard('student');
+  if (!me) return;
+  const premiumLeft = Number(me.profile?.premiumDaysLeft || 0);
+  try {
+    const data = await authFetch('/api/progress');
+    const done = Array.isArray(data.completedDays) && data.completedDays.includes(DAY);
+    // 1-kun hamma uchun ochiq (Sinov darsi).
+    // 2-kundan 91-kungacha — faqat premium yoki allaqachon o'tilgan kun bo'lsa ochiladi.
+    if (DAY !== 1 && premiumLeft <= 0 && !done) {
+      location.replace('app.html?pay=1');
+      return;
+    }
+    paintDayState(data.completedDays);
+  } catch {
+    if (DAY !== 1 && premiumLeft <= 0) {
+      location.replace('app.html?pay=1');
+      return;
+    }
+    paintDayState([]);
+  }
+})();
+</script>
+</body>
+</html>

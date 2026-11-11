@@ -19,3 +19,20 @@
   .top-right .todayDate,.top-right #todayDate{display:none}
 }
 .password{display:inline-block;background:#f2f4f9;border:1px solid #e2e6ee;border-radius:6px;padding:2px 8px;font-family:'Consolas','Menlo',monospace;font-size:11.5px;color:#3157a4;letter-spacing:0.5px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== Barcha ekranlar: gorizontal scrollni oldini olish ===== */
+html{overflow-x:hidden}
+.grid > .panel{min-width:0} /* grid ustuni ichidagi uzun kontent panelni cho'zmasin */
+
+/* ===== Telefon/planshet: iOS zoom oldini olish (input 16px) ===== */
+@media(max-width:720px){
+  .input, .filter, .search input{font-size:16px}
+  .mini{padding:8px 12px;font-size:11px} /* barmoq bilan bosish osonroq */
+  .crumb{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .topbar{padding-left:max(15px, env(safe-area-inset-left));padding-right:max(15px, env(safe-area-inset-right))}
+  .sidebar{padding-left:max(16px, env(safe-area-inset-left))}
+  footer{padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right))}
+}
+@media(max-width:430px){
+  .crumb b{max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}

@@ -17,6 +17,7 @@ API:
     GET  /api/me             token  - joriy profil
     POST /api/logout         token  - chiqish
     GET  /api/students       admin  - o'quvchilar ro'yxati
+    POST /api/students/<id>/password  admin - o'quvchi parolini o'zgartirish
     ...
 """
 
@@ -181,7 +182,6 @@ def init_db() -> None:
         )
 
         now = datetime.now(timezone.utc).isoformat()
-        default_until = (datetime.now(timezone.utc) + timedelta(days=DEFAULT_PREMIUM_DAYS)).isoformat()
 
         if conn.execute("SELECT COUNT(*) FROM students").fetchone()[0] == 0:
             for name, email, level, phone in SEED_STUDENTS:
@@ -189,16 +189,10 @@ def init_db() -> None:
                 conn.execute(
                     "INSERT INTO students (full_name, email, password_salt, password_hash,"
                     " level, phone, status, created_at, premium_until, plain_password) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                    (name, email, salt, hash_password("demo1234", salt), level, phone, "active", now, default_until, "demo1234"),
+                    (name, email, salt, hash_password("demo1234", salt), level, phone, "active", now, '', "demo1234"),
                 )
 
-        # Premium muddati kiritilmagan o'quvchilarga 91 kunlik boshlang'ich muddat
-        conn.execute(
-            "UPDATE students SET premium_until = ? WHERE premium_until IS NULL OR premium_until = ''",
-            (default_until,),
-        )
-
-        # Demo urug' (seed) o'quvchilarining paroli ma'lum — admin panelida ko'rinsin
+        # Demo urug' (seed) o'quvchilarining paroli ma'lum - admin panelida ko'rinsin
         conn.execute(
             "UPDATE students SET plain_password = 'demo1234'"
             " WHERE email IN ('aziza@example.com','bekzod@example.com','dilnoza@example.com')"
@@ -378,6 +372,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self.api_payment_info()
         if path == "/api/progress":
             return self.api_get_progress()
+        if path == "/api/leaderboard":
+            return self.api_leaderboard()
         if path == "/api/payments/me":
             return self.api_my_payments()
         if path == "/api/payments":
@@ -402,11 +398,12 @@ class Handler(SimpleHTTPRequestHandler):
             return self.api_complete_day()
         if path == "/api/payments":
             return self.api_create_payment()
-        if path == "/api/me/password":
-            return self.api_change_password()
         match = re.fullmatch(r"/api/students/(\d+)/premium", path)
         if match:
             return self.api_manual_premium(int(match.group(1)))
+        match = re.fullmatch(r"/api/students/(\d+)/password", path)
+        if match:
+            return self.api_admin_set_password(int(match.group(1)))
         return self.send_json({"error": "Topilmadi"}, HTTPStatus.NOT_FOUND)
 
     def do_PATCH(self) -> None:
@@ -563,9 +560,7 @@ class Handler(SimpleHTTPRequestHandler):
 
         salt = secrets.token_hex(8)
         now = datetime.now(timezone.utc).isoformat()
-        premium_until = (
-            datetime.now(timezone.utc) + timedelta(days=DEFAULT_PREMIUM_DAYS)
-        ).isoformat()
+        premium_until = ''  # premium faqat to'lov (yoki admin qo'lda bergani) bilan ochiladi
         try:
             with db() as conn:
                 cur = conn.execute(
@@ -635,32 +630,106 @@ class Handler(SimpleHTTPRequestHandler):
             row = conn.execute("SELECT * FROM students WHERE id = ?", (row["id"],)).fetchone()
         self.send_json({"ok": True, "profile": student_public(row)})
 
-    def api_change_password(self) -> None:
-        session = self.require_student()
-        if session is None:
+    def api_admin_set_password(self, student_id: int) -> None:
+        """Admin o'quvchi parolini o'zgartiradi (faqat admin paneldan)."""
+        if self.require_admin() is None:
             return
         data = self.read_json()
-        current = str(data.get("currentPassword") or "")
-        new = str(data.get("newPassword") or "")
+        new = str(data.get("password") or "")
         if len(new) < 6:
             return self.send_json(
                 {"error": "Yangi parol kamida 6 belgidan iborat bo‘lsin."},
                 HTTPStatus.BAD_REQUEST,
             )
+        salt = secrets.token_hex(8)
         with db() as conn:
-            row = conn.execute("SELECT * FROM students WHERE id = ?", (session["ref_id"],)).fetchone()
-            if row is None:
-                return self.send_json({"error": "Profil topilmadi."}, HTTPStatus.NOT_FOUND)
-            if not verify_password(current, row["password_salt"], row["password_hash"]):
-                return self.send_json(
-                    {"error": "Joriy parol noto‘g‘ri."}, HTTPStatus.BAD_REQUEST
-                )
-            salt = secrets.token_hex(8)
-            conn.execute(
+            cur = conn.execute(
                 "UPDATE students SET password_salt = ?, password_hash = ?, plain_password = ? WHERE id = ?",
-                (salt, hash_password(new, salt), new, row["id"]),
+                (salt, hash_password(new, salt), new, student_id),
+            )
+            if cur.rowcount == 0:
+                return self.send_json({"error": "O‘quvchi topilmadi."}, HTTPStatus.NOT_FOUND)
+            # Parol o'zgargach eski sessiyalar bekor qilinadi — qayta kirish kerak bo'ladi.
+            conn.execute(
+                "DELETE FROM sessions WHERE role = 'student' AND ref_id = ?",
+                (student_id,),
             )
         self.send_json({"ok": True})
+
+    def api_leaderboard(self) -> None:
+        """Reyting: eng yaxshi o'quvchilar (ball = o'quv kunlari * 50)."""
+        session = self.require_student()
+        if session is None:
+            return
+        with db() as conn:
+            rows = conn.execute(
+                "SELECT s.id, s.full_name, s.level, COALESCE(p.completed_days, '[]') AS days_json"
+                " FROM students s"
+                " LEFT JOIN progress p ON p.student_id = s.id"
+                " WHERE s.status = 'active'"
+            ).fetchall()
+        entries = []
+        for r in rows:
+            try:
+                completed = json.loads(r["days_json"] or "[]")
+                days = len(completed) if isinstance(completed, list) else 0
+            except (ValueError, TypeError):
+                days = 0
+            entries.append({
+                "id": r["id"],
+                "name": r["full_name"] or "",
+                "level": r["level"] or "",
+                "days": days,
+                "points": days * 50,
+            })
+        entries.sort(key=lambda e: (-e["points"], e["name"].lower()))
+        total = len(entries)
+
+        def short_name(full: str) -> str:
+            parts = [p for p in str(full or "").split() if p]
+            if not parts:
+                return "O‘quvchi"
+            if len(parts) == 1:
+                return parts[0]
+            return parts[0] + " " + parts[-1][0].upper() + "."
+
+        def public(e):
+            return {
+                "id": e["id"],
+                "name": short_name(e["name"]),
+                "level": e["level"],
+                "days": e["days"],
+                "points": e["points"],
+                "isMe": e["id"] == session["ref_id"],
+            }
+
+        # O'rinlar (teng ball — bir xil o'rin)
+        rank = 0
+        last_points = None
+        for idx, e in enumerate(entries):
+            if e["points"] != last_points:
+                rank = idx + 1
+                last_points = e["points"]
+            e["rank"] = rank
+
+        me = next((e for e in entries if e["id"] == session["ref_id"]), None)
+        if me is None:
+            me = {"id": session["ref_id"], "name": "", "level": "", "days": 0, "points": 0, "rank": total + 1}
+        total_points = sum(e["points"] for e in entries)
+        average = round(total_points / total, 1) if total else 0
+        top = []
+        for e in entries[:10]:
+            item = public(e)
+            item["rank"] = e["rank"]
+            top.append(item)
+        me_item = public(me)
+        me_item["rank"] = me["rank"]
+        self.send_json({
+            "totalStudents": total,
+            "average": average,
+            "me": me_item,
+            "top": top,
+        })
 
     def _progress_payload(self, row: sqlite3.Row | None) -> dict:
         days: list[int] = []
@@ -939,9 +1008,7 @@ class Handler(SimpleHTTPRequestHandler):
 
         salt = secrets.token_hex(8)
         now = datetime.now(timezone.utc).isoformat()
-        premium_until = (
-            datetime.now(timezone.utc) + timedelta(days=DEFAULT_PREMIUM_DAYS)
-        ).isoformat()
+        premium_until = ''  # premium faqat to'lov (yoki admin qo'lda bergani) bilan ochiladi
         try:
             with db() as conn:
                 cur = conn.execute(

@@ -21,18 +21,13 @@ function authHeaders(extra) {
   return h;
 }
 
-/* ======== PAROLSIZ ADMIN REJIMI (faqat kompyuterda/demo) ======== */
-/* Admin panel ochilishi bilan demo admin hisobi orqali sessiya */
-/* avtomatik olinadi — kirish oynasi yo'q. DIQQAT: himoyasiz rejim. */
-const DEMO_ADMIN = { email: 'admin@sprichde.uz', password: 'admin123' };
-
 async function api(path, options = {}) {
   const doFetch = () => fetch(API + path, { ...options, headers: authHeaders(options.headers) });
   let res = await doFetch();
   if (res.status === 401) {
-    // Sessiya eskirgan bo'lsa — parolsiz qayta kiramiz
+    // Sessiya eskirgan bo‘lsa - demo admin bilan avtomatik qayta kiramiz
     try { clearAuth(); } catch {}
-    try { await ensureAdminSession(); } catch { /* quyida xato qaytariladi */ }
+    try { await ensureAdminSession(); } catch {}
     res = await doFetch();
     if (res.status === 401) throw new Error('Ruxsat yo‘q. Backend admin hisobini tekshiring.');
   }
@@ -273,7 +268,8 @@ function studentRows(items) {
         <div class="table-secondary">${esc(x.email)}</div>
       </td>
       <td><span class="tag">${esc(levelLabel(x.level))}</span></td>
-      <td><span class="table-secondary" style="font-family:monospace;font-size:12px">${esc(x.password ?? '—')}</span></td>
+      <td class="pay-cell"><span class="table-secondary" style="font-family:monospace;font-size:12px">${esc(x.password ?? '—')}</span>
+        <div class="pay-actions"><button class="mini" data-set-password="${x.id}">Parolni o'zgartirish</button></div></td>
       <td>${esc(x.phone || '—')}</td>
       <td>${studentStatusTag(x.status)}</td>
       <td class="pay-cell">${paymentCell(x)}</td>
@@ -354,6 +350,29 @@ function paintStudents() {
     String(x.email).toLocaleLowerCase('uz').includes(q)
   );
   box.innerHTML = studentRows(found);
+
+  box.querySelectorAll('[data-set-password]').forEach((b) => b.addEventListener('click', async () => {
+    const id = Number(b.dataset.setPassword);
+    const target = students.find((x) => x.id === id);
+    const answer = prompt(`“${target?.fullName || 'O‘quvchi'}” uchun yangi parol kiriting (kamida 6 belgi):`);
+    if (answer === null) return;
+    if (answer.length < 6) {
+      notify('Parol kamida 6 belgidan iborat bo‘lsin.');
+      return;
+    }
+    b.disabled = true;
+    try {
+      await api('/api/students/' + id + '/password', {
+        method: 'POST',
+        body: JSON.stringify({ password: answer }),
+      });
+      notify('Parol o‘zgartirildi. O‘quvchi yangi parol bilan qayta kiradi.');
+      await loadStudents();
+    } catch (err) {
+      b.disabled = false;
+      notify(err.message);
+    }
+  }));
 
   box.querySelectorAll('[data-student-delete]').forEach((b) => b.addEventListener('click', async () => {
     const id = Number(b.dataset.studentDelete);
@@ -498,7 +517,11 @@ document.querySelector('#notificationButton').addEventListener('click', () => no
 document.querySelector('#helpButton').addEventListener('click', () => notify('Dars bo‘limidan yangi kontent qo‘shing, o‘quvchilar bo‘limida to‘lovlarni tasdiqlang.'));
 document.querySelector('#todayDate').textContent = new Intl.DateTimeFormat('uz-UZ', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date());
 
-/* ---------------------- Admin autentifikatsiyasi (parolsiz rejim) ---------------------- */
+/* ---------------------- Admin (parolsiz demo rejim) ---------------------- */
+/* Admin panel ochilganda demo admin hisobi bilan avtomatik sessiya olinadi - */
+/* kirish oynasi yo'q. DIQQAT: bu faqat lokal demo uchun. Internetga chiqishdan */
+/* oldin admin himoyasini qayta yoqing (DEPLOY.md). */
+const DEMO_ADMIN = { email: 'admin@sprichde.uz', password: 'admin123' };
 
 function showAdminApp(profile) {
   const appEl = document.querySelector('#adminApp');
@@ -526,7 +549,7 @@ async function ensureAdminSession() {
       }
     }
   } catch {
-    /* saqlangan sessiya yaroqsiz — avtomatik kirishga o'tamiz */
+    /* saqlangan sessiya yaroqsiz — demo kirishga o'tamiz */
   }
   const data = await authFetch('/api/admin/login', {
     method: 'POST',
@@ -545,7 +568,8 @@ async function ensureAdminSession() {
   } catch (err) {
     const box = document.querySelector('#pageContent');
     if (box) {
-      box.innerHTML = `<div class="empty" style="display:block"><b>Serverga ulanib bo‘lmadi</b><small>${esc(err.message)}<br>Backend ishga tushirilganiga ishonch hosil qiling (python run_app.py yoki PyCharm ▶).</small></div>`;
+      box.innerHTML = `<div class="empty" style="display:block"><b>Serverga ulanib bo'lmadi</b><small>${esc(err.message)}<br>Backend ishga tushirilganiga ishonch hosil qiling (python run_app.py yoki PyCharm ▶).</small></div>`;
     }
   }
 })();
+

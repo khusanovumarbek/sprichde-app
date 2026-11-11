@@ -9,7 +9,7 @@ Ochilishi: `index.html` → kirish → `app.html` (kabinet)
 - `index.html` — **Kirish** (email + parol)
 - `register.html` — **Ro‘yxatdan o‘tish** (ism, telefon, email, daraja, parol)
 - `app.html` — **O‘quvchi kabineti** (91 kunlik sayohat, darslar, lug‘at, mashq, to‘lov)
-- `journey.html` / `trial.html` / `invite.html` — sayohat, sinov darsi, taklif
+- `journey.html` / `trial.html` (1-kun bilan bir sahifaga yo'naltiradi) / `invite.html` - sayohat, sinov darsi, taklif
 
 Ro‘yxatdan o‘tgan har bir o‘quvchi backend bazasiga (`backend/data/sprichde.db`) qo‘shiladi va **Admin panel → O‘quvchilar** bo‘limida darhol ko‘rinadi.
 
@@ -19,7 +19,7 @@ Ochilishi: `PyCharm` → `run_app.py` yoki `run_admin.py` → ▶ Play (yoki `ht
 
 - `admin.html` — **Admin panel** (Umumiy ko‘rinish, Darslar, O‘quvchilar)
 - `app.js` / `styles.css` — panel kodi
-- **Kirish talab qilinmaydi** (kompyuterda demo uchun to‘g‘ridan-to‘g‘ri ochiladi)
+- **Kirish oynasi yo‘q (lokal demo)** — `/admin.html` ochilganda panel darhol ochiladi; backend `SEED_ADMIN` (`admin@sprichde.uz` / `admin123`) bilan avtomatik sessiya oladi. Internetga chiqishdan oldin **bazaga to‘g‘ridan-to‘g‘ri himoya yoqish kerak** (bu faqat kompyuterda demo uchun).
 
 Admin panel **O‘quvchilar** bo‘limida har bir o‘quvchi uchun ko‘rsatiladi: ism/email, daraja, **parol**, telefon, holati, **to‘lov holati** (To‘langan / To‘lamagan / Kutilmoqda / Rad etilgan) va premium kunlari. Admin to‘lovlarni tasdiqlashi, rad etishi, o‘quvchini bloklab/o‘chirishi yoki premium qo‘lda berishi mumkin.
 

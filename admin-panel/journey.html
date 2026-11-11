@@ -1,15 +1,17 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="uz">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f8fc">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1b33">
 <title>SprichDe · 91 kunlik sayohat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="auth.js"></script>
 <script src="theme.js"></script>
+<script src="lessons-data.js"></script>
 <link rel="manifest" href="manifest.json">
 <meta name="application-name" content="SprichDe">
 <meta name="mobile-web-app-capable" content="yes">
@@ -22,21 +24,31 @@
 <link rel="stylesheet" href="theme.css">
 <style>
 :root{font-family:Inter,"Segoe UI",Arial,sans-serif;--blue:var(--primary);--blue-dark:var(--primary-2);--muted:#788196;--line:#e9ebf2;--soft:#e7efff;--shadow:0 10px 26px #1d2b4b0f}
+html{overflow-x:hidden}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
-.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:5}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x:hidden}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right));position:sticky;top:0;z-index:5}
 .back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px;text-decoration:none;color:var(--text)}
 .topbar b{font-size:16px;font-weight:800}
-.wrap{max-width:520px;margin:0 auto;padding:22px 20px 60px}
+.wrap{max-width:520px;margin:0 auto;padding:22px 20px 60px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
 .intro{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
 .intro small{font-size:10.5px;font-weight:800;letter-spacing:2px;color:#ffffffcc}
 .intro b{display:block;font-size:22px;font-weight:800;margin-top:6px}
 .intro p{margin:6px 0 0;font-size:12.5px;color:#ffffffd9}
-.days{margin-top:20px;display:grid;gap:10px}
-.day{display:flex;align-items:center;gap:14px;padding:14px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
-.day .d-num{width:40px;height:40px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-weight:800;font-size:14px;color:var(--blue);flex:none}
+.days{margin-top:14px;display:grid;gap:14px}
+.day{display:flex;align-items:center;gap:17px;padding:17px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.day .d-num{width:44px;height:44px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-weight:800;font-size:14px;color:var(--blue);flex:none}
+.day{position:relative;cursor:pointer}
+.day:hover{border-color:var(--blue)}
+.day-icon-wrap{position:relative;flex:none}
+.day-icon{width:48px;height:48px;border:0;border-radius:14px;background:var(--soft);display:grid;place-items:center;font-size:23px;cursor:pointer;box-shadow:0 2px 8px #1d2b4b0d;transition:transform .18s,background .18s}
+.day-icon:hover,.day-icon:focus-visible{transform:translateY(-2px) scale(1.04);outline:2px solid var(--blue);outline-offset:2px}
+.day.done .day-icon{background:#e7f6ec}
+.word-pop{position:absolute;left:50%;bottom:calc(100% + 10px);transform:translate(-50%,6px);width:max-content;max-width:min(250px,75vw);padding:9px 12px;border-radius:11px;background:#1c2942;color:#fff;font-size:12px;font-weight:700;line-height:1.45;text-align:center;box-shadow:0 8px 22px #101a3033;opacity:0;visibility:hidden;pointer-events:none;transition:.16s;z-index:4}
+.word-pop::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#1c2942}
+.day-icon-wrap.open .word-pop{opacity:1;visibility:visible;transform:translate(-50%,0)}
 .day .d-body{flex:1;min-width:0}
-.day .d-body b{display:block;font-size:14px;font-weight:700}
+.day .d-body b{display:block;font-size:14px;font-weight:700;overflow-wrap:anywhere}
 .day .d-body small{font-size:11.5px;color:var(--muted)}
 .day .d-state{font-size:11px;font-weight:800;padding:5px 10px;border-radius:20px;flex:none}
 .day.done{border-color:#bfe6cb}
@@ -46,7 +58,34 @@ html[data-theme="dark"] .day.done .d-num{background:#1d3a28;color:#57d18a}
 .day.done .d-state{background:#e7f6ec;color:#1d9a52}
 html[data-theme="dark"] .day.done .d-state{background:#1d3a28;color:#57d18a}
 .day .d-state.locked{background:var(--surface-2);color:var(--muted)}
+.day .d-state.premium{background:#fff5dc;color:#a37e1e}
+html[data-theme="dark"] .day .d-state.premium{background:#3c3218;color:#f0c96a}
+.day.locked-day .day-icon{opacity:.55;filter:grayscale(1)}
+.day.locked-day .d-num{opacity:.7}
 .note{margin-top:18px;font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center}
+
+/* Juda kichik telefonlar (iPhone SE va sh.k.) */
+@media (max-width: 380px){
+  .wrap{padding:16px 14px 50px;padding-left:max(14px, env(safe-area-inset-left));padding-right:max(14px, env(safe-area-inset-right))}
+  .topbar{padding:0 14px;padding-left:max(14px, env(safe-area-inset-left));padding-right:max(14px, env(safe-area-inset-right))}
+  .topbar b{font-size:15px}
+  .intro{padding:18px;border-radius:18px}
+  .intro b{font-size:19px}
+  .intro p{font-size:12px}
+  .day{padding:13px;gap:12px;border-radius:14px}
+  .day .d-num{width:40px;height:40px;font-size:13px}
+  .day-icon{width:44px;height:44px;font-size:21px}
+  .day .d-body b{font-size:13px}
+  .day .d-body small{font-size:10.5px}
+  .day .d-state{font-size:10px;padding:4px 8px}
+  .word-pop{font-size:11px}
+}
+
+/* Gorizontal (landshaft) rejim — balandlik kam bo'lganda */
+@media (max-height: 480px) and (orientation: landscape){
+  .wrap{padding-top:14px;padding-bottom:40px}
+  .topbar{height:52px}
+}
 </style>
 </head>
 <body>
@@ -65,42 +104,95 @@ html[data-theme="dark"] .day.done .d-state{background:#1d3a28;color:#57d18a}
 
   <div class="days" id="dayList"></div>
 
-  <p class="note">Sahifa tayyorlanmoqda — keyingi kunlar bosqichma-bosqich qo‘shiladi.</p>
+  <p class="note"><p class="note">Har bir kun: dars, so‘zlar va mashqdan iborat. Ochiq kunni bosib sayohatni davom ettiring!</p>
 </div>
 
 <script>
 const TOTAL_DAYS = 91;
-const lessonTitles = [
-  'Salomlashish — Hallo, Guten Tag',
-  'Kundalik tanishuv — Wie heißt du?',
-  'Kafe va buyurtma — Ich möchte…',
-  'Oila — die Familie',
-];
+const lessonTitles = window.DAY_LESSONS || [];
 
-function paintDays(completedDays) {
+function paintDays(completedDays, isPremium) {
   const list = document.getElementById('dayList');
   const done = Array.isArray(completedDays) ? completedDays : [];
-  list.innerHTML = lessonTitles.map((title, i) => {
+  list.innerHTML = lessonTitles.map((lesson, i) => {
     const n = i + 1;
     const isDone = done.includes(n);
+    // 1-kun — hamma uchun ochiq (Sinov darsi).
+    // 2-kundan 91-kungacha — faqat o‘tilgan kunlar yoki premium a’zolar uchun ochiq.
+    const locked = !isDone && n !== 1 && !isPremium;
+    const pill = isDone ? 'O‘tilgan' : locked ? '🔒 Premium' : (n === 1 ? 'Sinov darsi' : 'Ochiq');
+    const aria = locked ? (n + '-kun — premium talab qiladi') : (n + '-kun darsi');
     return `
-      <div class="day ${isDone ? 'done' : ''}">
+      <div class="day ${isDone ? 'done' : ''} ${locked ? 'locked-day' : ''}" data-day="${n}" role="link" tabindex="0" aria-label="${aria}">
         <span class="d-num">${isDone ? '✓' : n}</span>
-        <span class="d-body"><b>${title}</b><small>${n}-kun</small></span>
-        <span class="d-state ${isDone ? '' : 'locked'}">${isDone ? 'O‘tilgan' : 'Yopiq'}</span>
+        <span class="day-icon-wrap">
+          <button class="day-icon" type="button" aria-label="${lesson.title}" aria-expanded="false">${lesson.icon}</button>
+          <span class="word-pop" role="status">${(lesson.words || []).slice(0, 2).map(w => w[0] + ' — ' + w[1]).join('  •  ')}</span>
+        </span>
+        <span class="d-body"><b>${lesson.title}</b><small>${n}-kun</small></span>
+        <span class="d-state ${isDone ? '' : 'locked'} ${locked ? 'premium' : ''}">${pill}</span>
       </div>`;
   }).join('');
+  // Kunni bosganda — o‘sha kunning dars sahifasi ochiladi.
+  // (So‘zlar ikonkasi bosilsa — faqat so‘zlar oynasi ochiladi, sahifa emas.)
+  list.querySelectorAll('.day').forEach((dayEl) => {
+    const open = () => {
+      if (dayEl.classList.contains('locked-day')) { location.href = 'app.html?pay=1'; return; }
+      location.href = 'day.html?day=' + dayEl.dataset.day;
+    };
+    dayEl.addEventListener('click', (event) => {
+      if (event.target.closest('.day-icon-wrap')) return;
+      open();
+    });
+    dayEl.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        if (event.target !== dayEl) return;
+        event.preventDefault();
+        open();
+      }
+    });
+  });
+  list.querySelectorAll('.day-icon').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const wrap = button.closest('.day-icon-wrap');
+      const wasOpen = wrap.classList.contains('open');
+      list.querySelectorAll('.day-icon-wrap').forEach((item) => {
+        item.classList.remove('open');
+        item.querySelector('.day-icon')?.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        wrap.classList.add('open');
+        button.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
   document.getElementById('journeyCount').textContent = done.length + ' / ' + TOTAL_DAYS + ' kun';
 }
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.day-icon-wrap.open').forEach((wrap) => {
+    wrap.classList.remove('open');
+    wrap.querySelector('.day-icon')?.setAttribute('aria-expanded', 'false');
+  });
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') document.querySelectorAll('.day-icon-wrap.open').forEach((wrap) => {
+    wrap.classList.remove('open');
+    wrap.querySelector('.day-icon')?.setAttribute('aria-expanded', 'false');
+  });
+});
 
 (async function initJourney() {
   const me = await guard('student');
   if (!me) return;
+  const premiumLeft = Number(me.profile?.premiumDaysLeft || 0);
+  const isPremium = premiumLeft > 0;
   try {
     const data = await authFetch('/api/progress');
-    paintDays(data.completedDays);
+    paintDays(data.completedDays, isPremium);
   } catch {
-    paintDays([]);
+    paintDays([], isPremium);
   }
 })();
 </script>

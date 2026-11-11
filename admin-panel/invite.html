@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f8fc">
-<title>SprichDe · Do‘stni taklif qilish</title>
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1b33">
+<title>SprichDe · Do'stni taklif qilish</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,18 +24,19 @@
 <style>
 :root{font-family:Inter,"Segoe UI",Arial,sans-serif;--blue:var(--primary);--blue-dark:var(--primary-2);--ink:var(--text);--muted:#788196;--line:#e9ebf2;--shadow:0 10px 26px #1d2b4b0f}
 html[data-theme="dark"] body{background:var(--bg)}
+html{overflow-x:hidden}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
-.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:5}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x:hidden}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right));position:sticky;top:0;z-index:5}
 .back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px;text-decoration:none;color:var(--text)}
 .topbar b{font-size:16px;font-weight:800}
-.wrap{max-width:520px;margin:0 auto;padding:26px 20px 40px}
+.wrap{max-width:520px;margin:0 auto;padding:26px 20px 40px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
 .hero{text-align:center}
 .gift{width:82px;height:82px;border-radius:26px;background:#e7efff;display:grid;place-items:center;margin:0 auto 18px;font-size:38px}
 .hero h1{margin:0 0 8px;font-size:21px;font-weight:800}
 .hero p{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
 .link-box{margin-top:24px;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
-.link-box span{flex:1;font-size:12.5px;color:#4a5468;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link-box span{flex:1;min-width:0;font-size:12.5px;color:#4a5468;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .copy{border:0;background:#eef3ff;color:var(--blue);font:inherit;font-size:12.5px;font-weight:700;padding:11px 16px;border-radius:12px;cursor:pointer}
 .copy:hover{background:#dfe8ff}
 .share{margin-top:14px;width:100%;height:52px;border:0;border-radius:15px;background:var(--blue);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
@@ -53,7 +55,7 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 /* bottom sheet */
 .sheet-bg{position:fixed;inset:0;background:#1c243433;display:none;align-items:flex-end;z-index:40}
 .sheet-bg.show{display:flex}
-.sheet{width:100%;max-width:520px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding:12px 16px 26px;animation:up .22s ease}
+.sheet{width:100%;max-width:520px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding:12px 16px calc(26px + env(safe-area-inset-bottom));animation:up .22s ease}
 @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
 .handle{width:40px;height:4px;border-radius:4px;background:#e2e6ee;margin:4px auto 12px}
 .sheet h3{margin:0 0 10px;text-align:center;font-size:16px;font-weight:800}
@@ -63,6 +65,24 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text)}
 .sheet-item b{font-size:14px;font-weight:600}
 .toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);background:#1c2434;color:#fff;padding:12px 22px;border-radius:12px;font-size:12.5px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* Juda kichik telefonlar (iPhone SE va sh.k.) */
+@media (max-width: 380px){
+  .wrap{padding-top:18px}
+  .gift{width:72px;height:72px;font-size:33px;border-radius:22px;margin-bottom:14px}
+  .hero h1{font-size:19px}
+  .hero p{font-size:12.5px}
+  .link-box{gap:8px;padding:6px 6px 6px 12px}
+  .link-box span{font-size:11.5px}
+  .copy{padding:10px 12px;font-size:11.5px}
+  .share{height:50px;font-size:14px}
+  .socials{gap:8px}
+  .social{padding:13px 6px;border-radius:14px}
+  .social b{font-size:11px}
+  .stats{padding:15px 0}
+  .stat b{font-size:18px}
+  .stat small{font-size:10px}
+}
 </style>
 </head>
 <body>
