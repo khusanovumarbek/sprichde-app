@@ -1267,6 +1267,9 @@ el('paySubmit').addEventListener('click', async () => {
   const sync = () => {
     const pwa = window.SprichdePWA;
     btn.hidden = !pwa || pwa.isStandalone();
+    if (/Android/i.test(navigator.userAgent || '')) {
+      btn.querySelector('b').textContent = 'Play Marketda ochish';
+    }
   };
   sync();
   document.addEventListener('DOMContentLoaded', sync);
@@ -1274,7 +1277,16 @@ el('paySubmit').addEventListener('click', async () => {
   document.addEventListener('pwa:installable', sync);
   document.addEventListener('pwa:installed', sync);
 
+  // Android ochilganda Play Marketga yo‘naltiramiz.
+  // TODO: o‘z ilovamiz do‘konga chiqqach, id=com.duolingo o‘rniga ilovamizni yozing.
+  const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.duolingo';
+
   btn.addEventListener('click', async () => {
+    const isAndroid = /Android/i.test(navigator.userAgent || '');
+    if (isAndroid) {
+      window.open(PLAY_STORE_URL, '_blank', 'noopener');
+      return;
+    }
     const pwa = window.SprichdePWA;
     if (!pwa) return;
     if (pwa.canInstall()) {
