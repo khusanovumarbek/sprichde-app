@@ -149,12 +149,16 @@ def init_db() -> None:
                     level         TEXT    NOT NULL DEFAULT 'Anfanger',
                     phone         TEXT    DEFAULT '',
                     status        TEXT    NOT NULL DEFAULT 'active',
+                    premium_until TEXT    DEFAULT '',
+                    plain_password TEXT   DEFAULT '',
+                    avatar        TEXT    DEFAULT '',
                     created_at    TEXT    NOT NULL
                 )
             """)
             conn.execute("""
-                INSERT INTO students (id, full_name, email, password_salt, password_hash, level, phone, status, created_at)
-                SELECT id, full_name, NULLIF(email, ''), password_salt, password_hash, level, phone, status, created_at
+                INSERT INTO students (id, full_name, email, password_salt, password_hash, level, phone, status, premium_until, plain_password, avatar, created_at)
+                SELECT id, full_name, NULLIF(email, ''), password_salt, password_hash, level, phone, status,
+                       COALESCE(premium_until, ''), COALESCE(plain_password, ''), COALESCE(avatar, ''), created_at
                 FROM students_old
             """)
             conn.execute("DROP TABLE students_old")
