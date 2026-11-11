@@ -23,6 +23,7 @@ API:
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
@@ -130,6 +131,7 @@ def init_db() -> None:
         # Yangi ustunlar (eski bazalar uchun migratsiya)
         ensure_column(conn, "students", "premium_until", "TEXT DEFAULT ''")
         ensure_column(conn, "students", "plain_password", "TEXT DEFAULT ''")
+        ensure_column(conn, "students", "avatar", "TEXT DEFAULT ''")
 
         conn.execute(
             """
@@ -249,6 +251,7 @@ def student_public(row: sqlite3.Row, payment: sqlite3.Row | None = None) -> dict
         "createdAt": row["created_at"],
         "premiumUntil": row["premium_until"] or "",
         "premiumDaysLeft": days_left(row["premium_until"]),
+        "avatar": row["avatar"] or "",
         "payment": payment_public(payment) if payment is not None else None,
     }
 
@@ -397,6 +400,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self.api_create_student()
         if path == "/api/progress/complete":
             return self.api_complete_day()
+        if path == "/api/me/avatar":
+            return self.api_set_avatar()
         if path == "/api/payments":
             return self.api_create_payment()
         match = re.fullmatch(r"/api/students/(\d+)/premium", path)
@@ -618,15 +623,35 @@ class Handler(SimpleHTTPRequestHandler):
             row = conn.execute("SELECT * FROM students WHERE id = ?", (session["ref_id"],)).fetchone()
             if row is None:
                 return self.send_json({"error": "Profil topilmadi."}, HTTPStatus.NOT_FOUND)
-            name = str(data.get("fullName") or row["full_name"]).strip()
+            # fullName yoki firstName/lastName
+            first = str(data.get("firstName") or "").strip()
+            last = str(data.get("lastName") or "").strip()
+            if first or last:
+                name = (first + " " + last).strip()
+            else:
+                name = str(data.get("fullName") or row["full_name"]).strip()
             phone = str(data["phone"] if "phone" in data else row["phone"] or "").strip()
+            email = str(data["email"] if "email" in data else row["email"]).strip().lower()
             if len(name) < 2:
                 return self.send_json(
                     {"error": "Ism-familiyani to‘liq kiriting."}, HTTPStatus.BAD_REQUEST
                 )
+            if not EMAIL_RE.match(email):
+                return self.send_json(
+                    {"error": "Email manzil noto‘g‘ri."}, HTTPStatus.BAD_REQUEST
+                )
+            if email != (row["email"] or "").lower():
+                taken = conn.execute(
+                    "SELECT id FROM students WHERE email = ? AND id != ?",
+                    (email, row["id"]),
+                ).fetchone()
+                if taken:
+                    return self.send_json(
+                        {"error": "Bu email allaqachon band."}, HTTPStatus.CONFLICT
+                    )
             conn.execute(
-                "UPDATE students SET full_name = ?, phone = ? WHERE id = ?",
-                (name, phone, row["id"]),
+                "UPDATE students SET full_name = ?, phone = ?, email = ? WHERE id = ?",
+                (name, phone, email, row["id"]),
             )
             row = conn.execute("SELECT * FROM students WHERE id = ?", (row["id"],)).fetchone()
         self.send_json({"ok": True, "profile": student_public(row)})
@@ -731,6 +756,40 @@ class Handler(SimpleHTTPRequestHandler):
             "me": me_item,
             "top": top,
         })
+
+    def api_set_avatar(self) -> None:
+        """O'quvchi o'z rasmini (base64 data URI) saqlaydi."""
+        session = self.require_student()
+        if session is None:
+            return
+        data = self.read_json()
+        avatar = str(data.get("avatar") or "").strip()
+        if not avatar:
+            return self.send_json({"error": "Rasm bo'sh bo'lmasin."}, HTTPStatus.BAD_REQUEST)
+        match = re.fullmatch(r"data:image/(png|jpe?g|webp);base64,([A-Za-z0-9+/=\s]+)", avatar)
+        if not match:
+            return self.send_json(
+                {"error": "Rasm formati noto‘g‘ri (PNG, JPG yoki WEBP)."}, HTTPStatus.BAD_REQUEST
+            )
+        try:
+            blob = base64.b64decode(match.group(2), validate=True)
+        except Exception:
+            return self.send_json({"error": "Rasm formati noto‘g‘ri."}, HTTPStatus.BAD_REQUEST)
+        if len(blob) > 700_000:
+            return self.send_json(
+                {"error": "Rasm hajmi 700KB dan oshmasin."}, HTTPStatus.BAD_REQUEST
+            )
+        ext = {"jpeg": "jpg", "jpg": "jpg", "png": "png", "webp": "webp"}[match.group(1).lower()]
+        mime = "image/jpeg" if ext == "jpg" else f"image/{ext}"
+        data_uri = f"data:{mime};base64," + base64.b64encode(blob).decode("ascii")
+        with db() as conn:
+            conn.execute(
+                "UPDATE students SET avatar = ? WHERE id = ?", (data_uri, session["ref_id"])
+            )
+            row = conn.execute(
+                "SELECT * FROM students WHERE id = ?", (session["ref_id"],)
+            ).fetchone()
+        self.send_json({"ok": True, "profile": student_public(row)})
 
     def _progress_payload(self, row: sqlite3.Row | None) -> dict:
         days: list[int] = []

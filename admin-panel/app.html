@@ -261,6 +261,8 @@ html[data-theme="dark"] .badge-new{color:#ffd98a;background:#4a3a12}
 .profile-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
 .p-head{display:flex;align-items:center;gap:14px}
 .p-avatar{position:relative;width:66px;height:66px;flex:none;border-radius:50%;
+#pAvatarImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+
   background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;
   display:grid;place-items:center;font-size:24px;font-weight:800;
   box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--soft)}
@@ -551,12 +553,14 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
       <div class="p-head">
         <div class="p-avatar">
           <span id="pInitials">?</span>
-          <button class="p-cam" type="button" aria-label="Rasmni o‘zgartirish">📷</button>
+          <img id="pAvatarImg" alt="Profil rasmi" hidden>
+          <button class="p-cam" type="button" id="pCamBtn" aria-label="Rasmni o‘zgartirish">📷</button>
         </div>
         <div class="p-info">
           <b id="pName">Foydalanuvchi</b>
           <small id="pEmail">email</small>
         </div>
+        <input type="file" id="avatarInputApp" accept="image/*" capture="user" hidden>
         <button class="p-theme" id="itemTheme" type="button" aria-label="Tungi rejimni almashtirish" title="Tungi rejimga o‘tish"><span id="themeIcon">🌙</span></button>
         <button class="p-edit" id="editProfileBtn" type="button" aria-label="Tahrirlash">✏️</button>
       </div>
@@ -688,7 +692,16 @@ function paintUser() {
   if (!profile) return;
   const first = String(profile.fullName || 'do‘st').split(' ')[0];
   el('userName').textContent = 'Salom, ' + first;
-  el('userAvatar').textContent = first.slice(0, 1).toUpperCase();
+  const top = el('userAvatar');
+  if (profile.avatar) {
+    top.style.backgroundImage = 'url(' + profile.avatar + ')';
+    top.style.backgroundSize = 'cover';
+    top.style.backgroundPosition = 'center';
+    top.textContent = '';
+  } else {
+    top.style.backgroundImage = 'none';
+    top.textContent = first.slice(0, 1).toUpperCase();
+  }
 }
 
 function paintJourney() {
@@ -734,7 +747,17 @@ function paintProfile() {
 
   el('pName').textContent = profile.fullName;
   el('pEmail').textContent = profile.email;
-  el('pInitials').textContent = initials(profile.fullName);
+  const img = el('pAvatarImg');
+  if (profile.avatar) {
+    img.src = profile.avatar;
+    img.hidden = false;
+    el('pInitials').hidden = true;
+  } else {
+    img.removeAttribute('src');
+    img.hidden = true;
+    el('pInitials').hidden = false;
+    el('pInitials').textContent = initials(profile.fullName);
+  }
   el('pStreak').textContent = done;
   el('pLevel').textContent = level;
   el('pPoints').textContent = done * 50;
@@ -970,6 +993,58 @@ function openProfileView() {
 }
 el('userAvatar').addEventListener('click', openProfileView);
 
+// Profil rasmini qo'yish / yangilash
+async function uploadAvatar(file) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Fayl o‘qilmadi'));
+    reader.readAsDataURL(file);
+  });
+  const image = await new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Rasm formati noto‘g‘ri'));
+    img.src = dataUrl;
+  });
+  const canvas = document.createElement('canvas');
+  const size = 512;
+  const scale = Math.min(1, size / Math.max(image.width, image.height));
+  canvas.width = Math.max(1, Math.round(image.width * scale));
+  canvas.height = Math.max(1, Math.round(image.height * scale));
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  const resized = canvas.toDataURL('image/jpeg', 0.85);
+  if (resized.length > 700000) throw new Error('Rasm hajmi juda katta — boshqasini tanlang.');
+  const data = await authFetch('/api/me/avatar', {
+    method: 'POST',
+    body: JSON.stringify({ avatar: resized }),
+  });
+  profile = data.profile;
+  const auth = getAuth();
+  if (auth) setAuth({ ...auth, profile });
+  paintUser();
+  paintProfile();
+}
+
+const avatarInput = el('avatarInputApp');
+const pCamBtn = el('pCamBtn');
+if (pCamBtn && avatarInput) {
+  pCamBtn.addEventListener('click', () => avatarInput.click());
+  avatarInput.addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { alert('Faqat rasm fayllari qabul qilinadi'); return; }
+    try {
+      await uploadAvatar(file);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      e.target.value = '';
+    }
+  });
+}
+
 document.querySelectorAll('.nav button').forEach((btn) => btn.addEventListener('click', () => {
   document.querySelectorAll('.nav button').forEach((b) => b.classList.toggle('active', b === btn));
   const view = btn.dataset.view;
@@ -1204,27 +1279,7 @@ el('paySubmit').addEventListener('click', async () => {
 // ---------- Profil: chiqish va ism ----------
 el('itemLogout').addEventListener('click', logout);
 
-el('editProfileBtn').addEventListener('click', async () => {
-  const value = prompt('Yangi ism-familiyani kiriting:', profile?.fullName || '');
-  if (value === null) return;
-  const name = value.trim();
-  if (name.length < 2) {
-    alert('Ism-familiyani to‘liq kiriting.');
-    return;
-  }
-  try {
-    const res = await authFetch('/api/me', {
-      method: 'PATCH',
-      body: JSON.stringify({ fullName: name }),
-    });
-    profile = res.profile;
-    const auth = getAuth();
-    if (auth) setAuth({ ...auth, profile });
-    paintUser();
-    paintProfile();
-  } catch (err) {
-    alert(err.message);
-  }
+el('editProfileBtn').addEventListener('click', () => { location.href = 'edit-profile.html'; 
 });
 
 // ---------- Ishga tushirish ----------

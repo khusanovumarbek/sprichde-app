@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fc">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1b33">
+<title>SprichDe · Profilni tahrirlash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="application-name" content="SprichDe">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SprichDe">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<script src="pwa.js" defer></script>
+<link rel="stylesheet" href="theme.css">
+<style>
+:root{font-family:Inter,"Segoe UI",Arial,sans-serif;--blue:var(--primary);--blue-dark:var(--primary-2);--muted:#788196;--line:#e9ebf2;--soft:#e7efff;--shadow:0 10px 26px #1d2b4b0f}
+html{overflow-x:hidden}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x:hidden}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right));position:sticky;top:0;z-index:5}
+.back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px;text-decoration:none;color:var(--text)}
+.topbar b{font-size:16px;font-weight:800}
+.wrap{max-width:520px;margin:0 auto;padding:22px 20px 60px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+.avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.avatar-big{position:relative;width:104px;height:104px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--blue),var(--blue-dark));display:grid;place-items:center;color:#fff;font-size:38px;font-weight:800}
+.avatar-big img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar-btn{border:0;background:var(--soft);color:var(--blue);font:inherit;font-size:12px;font-weight:800;height:36px;padding:0 16px;border-radius:12px;cursor:pointer}
+.avatar-hint{font-size:10.5px;color:var(--muted)}
+
+form{display:grid;gap:13px}
+label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.3px}
+.input{width:100%;height:46px;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:0 13px;font:inherit;font-size:15px;color:var(--text);outline:none}
+.input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #3157a41f;background:var(--surface)}
+.error{font-size:11px;color:#d2453c;font-weight:600;min-height:14px}
+.btn{height:48px;border:0;border-radius:13px;background:var(--blue);color:#fff;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);background:#1c2434;color:#fff;padding:12px 22px;border-radius:12px;font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:380px){.wrap{padding-top:16px}.card{padding:18px}.avatar-big{width:96px;height:96px;font-size:34px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="back" href="app.html" aria-label="Orqaga qaytish">←</a>
+  <b>Profilni tahrirlash</b>
+</header>
+
+<div class="wrap">
+  <div class="card">
+    <div class="avatar-wrap">
+      <div class="avatar-big" id="avatarBox"><span id="avatarInitials">?</span><img id="avatarImg" alt="Profil rasmi" hidden></div>
+      <button class="avatar-btn" id="uploadBtn" type="button">📷 Rasm qo‘yish</button>
+      <div class="avatar-hint">Rasm JPG, PNG yoki WEBP · maksimal 700 KB</div>
+      <input type="file" id="avatarInput" accept="image/*" capture="user" hidden>
+    </div>
+
+    <form id="editForm" novalidate>
+      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+        <label>Familya
+          <input class="input" id="fLast" autocomplete="family-name" placeholder="Karimova">
+        </label>
+        <label>Ism
+          <input class="input" id="fFirst" autocomplete="given-name" placeholder="Aziza">
+        </label>
+      </div>
+      <label>Telefon raqami
+        <input class="input" id="fPhone" type="tel" autocomplete="tel" placeholder="+998 90 123 45 67">
+      </label>
+      <label>Email manzili
+        <input class="input" id="fEmail" type="email" autocomplete="email" placeholder="siz@example.com">
+      </label>
+      <div class="error" id="formError" role="alert"></div>
+      <button class="btn" type="submit" id="saveBtn">Saqlash</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const el = (id) => document.getElementById(id);
+let profile = null;
+let toastTimer;
+
+function notify(text) {
+  const toast = el('toast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+
+async function loadProfile() {
+  const me = await guard('student');
+  if (!me) return null;
+  profile = me.profile;
+  // Ism / familyani bo'lib yozamiz
+  const parts = String(profile.fullName || '').trim().split(/\s+/).filter(Boolean);
+  el('fFirst').value = parts[0] || '';
+  el('fLast').value = parts.slice(1).join(' ');
+  el('fPhone').value = profile.phone || '';
+  el('fEmail').value = profile.email || '';
+  paintAvatar(profile.avatar);
+  return profile;
+}
+
+function initials(name) {
+  return String(name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
+}
+
+function paintAvatar(avatar) {
+  const img = el('avatarImg');
+  const initialsEl = el('avatarInitials');
+  if (avatar) {
+    img.src = avatar;
+    img.hidden = false;
+    initialsEl.hidden = true;
+  } else {
+    img.removeAttribute('src');
+    img.hidden = true;
+    initialsEl.hidden = false;
+    initialsEl.textContent = initials(profile?.fullName);
+  }
+}
+
+async function uploadAvatar(file) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Fayl o‘qilmadi'));
+    reader.readAsDataURL(file);
+  });
+  // Kichikroq hajmiga keltiramiz (max 512px)
+  const img = await new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Rasm formati noto‘g‘ri'));
+    image.src = dataUrl;
+  });
+  const canvas = document.createElement('canvas');
+  const size = 512;
+  const scale = Math.min(1, size / Math.max(img.width, img.height));
+  canvas.width = Math.max(1, Math.round(img.width * scale));
+  canvas.height = Math.max(1, Math.round(img.height * scale));
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const resized = canvas.toDataURL('image/jpeg', 0.85);
+  if (resized.length > 700_000) {
+    throw new Error('Rasm hajmi juda katta — boshqasini tanlang.');
+  }
+  const data = await authFetch('/api/me/avatar', {
+    method: 'POST',
+    body: JSON.stringify({ avatar: resized }),
+  });
+  profile = data.profile;
+  paintAvatar(profile.avatar);
+  notify('Rasm yangilandi ✓');
+}
+
+// Rasm yuklash tugmasi
+el('uploadBtn').addEventListener('click', () => el('avatarInput').click());
+el('avatarInput').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  if (!/^image\//.test(file.type)) {
+    notify('Faqat rasm fayllari qabul qilinadi');
+    return;
+  }
+  try {
+    await uploadAvatar(file);
+  } catch (err) {
+    notify(err.message);
+  } finally {
+    e.target.value = '';
+  }
+});
+
+// Saqlash
+el('editForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errBox = el('formError');
+  errBox.textContent = '';
+  const firstName = el('fFirst').value.trim();
+  const lastName = el('fLast').value.trim();
+  const phone = el('fPhone').value.replace(/\s+/g, '');
+  const email = el('fEmail').value.trim().toLowerCase();
+  if (!firstName || !lastName) { errBox.textContent = 'Ism va familyani to‘liq kiriting.'; return; }
+  if (phone && !/^\+?\d{9,13}$/.test(phone)) {
+    errBox.textContent = 'Telefon raqami noto‘g‘ri (masalan +998901234567).';
+    return;
+  }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    errBox.textContent = 'Email manzili noto‘g‘ri.';
+    return;
+  }
+  const btn = el('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saqlanmoqda…';
+  try {
+    const data = await authFetch('/api/me', {
+      method: 'PATCH',
+      body: JSON.stringify({ firstName, lastName, phone, email }),
+    });
+    profile = data.profile;
+    const auth = getAuth();
+    if (auth) setAuth({ ...auth, profile });
+    notify('Profil saqlandi ✓');
+    setTimeout(() => { location.href = 'app.html'; }, 700);
+  } catch (err) {
+    errBox.textContent = err.message;
+    btn.disabled = false;
+    btn.textContent = 'Saqlash';
+  }
+});
+
+(async function init() {
+  const p = await loadProfile();
+  if (!p) return;
+})();
+</script>
+</body>
+</html>
