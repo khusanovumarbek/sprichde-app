@@ -173,7 +173,7 @@ label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--text);lett
     <p class="sub">Hisobingizga kirish uchun ma’lumotlaringizni kiriting.</p>
 
     <form id="loginForm" novalidate>
-      <label>Email<input class="input" name="email" id="fEmail" type="email" placeholder="siz@example.com" required autocomplete="email"></label>
+      <label>Telefon raqami<input class="input" name="phone" id="fPhone" type="tel" placeholder="+998 90 123 45 67" required autocomplete="tel"></label>
       <label>Parol<input class="input" name="password" id="fPassword" type="password" placeholder="Parolingiz" required autocomplete="current-password"></label>
       <div class="error-msg" id="formError"></div>
       <button class="button" type="submit" id="submitBtn">Kirish ↗</button>
@@ -211,10 +211,10 @@ label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--text);lett
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorBox.textContent = '';
-    const email = form.fEmail.value.trim().toLowerCase();
+    const phone = form.fPhone.value.replace(/\D/g, '');
     const password = form.fPassword.value;
-    if (!email || !password) {
-      errorBox.textContent = 'Email va parolni kiriting.';
+    if (!phone || !password) {
+      errorBox.textContent = 'Telefon raqami va parolni kiriting.';
       return;
     }
 
@@ -224,7 +224,7 @@ label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--text);lett
     try {
       const data = await authFetch('/api/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ phone, password }),
       });
       setAuth({ token: data.token, role: data.role, profile: data.profile });
       notify('Xush kelibsiz, ' + String(data.profile.fullName || '').split(' ')[0] + '!');

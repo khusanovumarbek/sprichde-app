@@ -133,6 +133,34 @@ def init_db() -> None:
         ensure_column(conn, "students", "plain_password", "TEXT DEFAULT ''")
         ensure_column(conn, "students", "avatar", "TEXT DEFAULT ''")
 
+        # Email ixtiyoriy: eski jadvaldagi NOT NULL UNIQUE cheklovini olib tashlaymiz
+        cols = conn.execute("PRAGMA table_info(students)").fetchall()
+        email_col = next((c for c in cols if c["name"] == "email"), None)
+        if email_col is not None and email_col["notnull"] == 1:
+            print("Migratsiya: students.email NOT NULL olib tashlanmoqda…")
+            conn.execute("ALTER TABLE students RENAME TO students_old")
+            conn.execute("""
+                CREATE TABLE students (
+                    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                    full_name     TEXT    NOT NULL,
+                    email         TEXT,
+                    password_salt TEXT    NOT NULL,
+                    password_hash TEXT    NOT NULL,
+                    level         TEXT    NOT NULL DEFAULT 'Anfanger',
+                    phone         TEXT    DEFAULT '',
+                    status        TEXT    NOT NULL DEFAULT 'active',
+                    created_at    TEXT    NOT NULL
+                )
+            """)
+            conn.execute("""
+                INSERT INTO students (id, full_name, email, password_salt, password_hash, level, phone, status, created_at)
+                SELECT id, full_name, NULLIF(email, ''), password_salt, password_hash, level, phone, status, created_at
+                FROM students_old
+            """)
+            conn.execute("DROP TABLE students_old")
+            conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_students_email ON students(email) WHERE email IS NOT NULL")
+            print("Migratsiya tugadi. Email endi ixtiyoriy.")
+
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS admins (
@@ -433,25 +461,40 @@ class Handler(SimpleHTTPRequestHandler):
 
     # --------------------------- autentifikatsiya -------------------------- #
 
+    @staticmethod
+    def _norm_phone(phone: str) -> str:
+        return re.sub(r"\D", "", str(phone or ""))
+
     def api_login(self, role: str) -> None:
         data = self.read_json()
-        email = str(data.get("email") or "").strip().lower()
         password = str(data.get("password") or "")
-        if not EMAIL_RE.match(email) or not password:
-            return self.send_json(
-                {"error": "Email va parolni kiriting."}, HTTPStatus.BAD_REQUEST
-            )
+        email = str(data.get("email") or "").strip().lower()
+        phone_digits = self._norm_phone(data.get("phone") or data.get("phone_number") or "")
 
         with db() as conn:
+            row = None
             if role == "admin":
+                if not EMAIL_RE.match(email) or not password:
+                    return self.send_json({"error": "Email va parolni kiriting."}, HTTPStatus.BAD_REQUEST)
                 row = conn.execute("SELECT * FROM admins WHERE email = ?", (email,)).fetchone()
             else:
-                row = conn.execute("SELECT * FROM students WHERE email = ?", (email,)).fetchone()
-
+                if phone_digits:
+                    if len(phone_digits) < 9:
+                        return self.send_json({"error": "Telefon raqam noto‘g‘ri."}, HTTPStatus.BAD_REQUEST)
+                    # Match by trailing digits ignoring formatting/spaces/plus
+                    row = conn.execute(
+                        "SELECT * FROM students WHERE REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'+',''),'(',''),')','') LIKE ?",
+                        ("%" + phone_digits.lstrip("0"),),
+                    ).fetchone()
+                elif EMAIL_RE.match(email):  # orqaga moslik uchun
+                    row = conn.execute("SELECT * FROM students WHERE email = ?", (email,)).fetchone()
+                if row is None:
+                    return self.send_json({"error": "Telefon raqam yoki parol noto‘g‘ri."}, HTTPStatus.BAD_REQUEST)
         # Email mavjudligini oshkor qilmaymiz
         if row is None or not verify_password(password, row["password_salt"], row["password_hash"]):
             return self.send_json(
-                {"error": "Email yoki parol noto‘g‘ri."}, HTTPStatus.UNAUTHORIZED
+                {"error": ("Telefon raqam yoki parol noto‘g‘ri." if role == 'student' else "Email yoki parol noto‘g‘ri.")},
+                HTTPStatus.UNAUTHORIZED,
             )
 
         if role == "student" and row["status"] == "blocked":
@@ -1059,11 +1102,15 @@ class Handler(SimpleHTTPRequestHandler):
         level = str(data.get("level") or "Anfänger").strip()
         phone = str(data.get("phone") or "").strip()
 
+        phone_digits = self._norm_phone(phone)
+        if len(phone_digits) < 9:
+            return self.send_json({"error": "Telefon raqamni to‘liq kiriting (masalan, +998901234567)."}, HTTPStatus.BAD_REQUEST)
+        if email and not EMAIL_RE.match(email):
+            return self.send_json({"error": "Email manzil noto‘g‘ri."}, HTTPStatus.BAD_REQUEST)
+
         error = None
         if len(name) < 2:
             error = "Ism-familiyani to‘liq kiriting."
-        elif not EMAIL_RE.match(email):
-            error = "Email manzil noto‘g‘ri."
         elif len(password) < 6:
             error = "Parol kamida 6 belgidan iborat bo‘lishi kerak."
         elif level not in LEVELS:
@@ -1074,13 +1121,22 @@ class Handler(SimpleHTTPRequestHandler):
         salt = secrets.token_hex(8)
         now = datetime.now(timezone.utc).isoformat()
         premium_until = ''  # premium faqat to'lov (yoki admin qo'lda bergani) bilan ochiladi
+        with db() as conn:
+            phone_exists = conn.execute(
+                "SELECT id FROM students WHERE REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'+',''),'(',''),')','') LIKE ?",
+                ("%" + phone_digits.lstrip("0"),),
+            ).fetchone()
+            if phone_exists:
+                return self.send_json(
+                    {"error": "Bu telefon raqami allaqachon ro‘yxatdan o‘tgan."}, HTTPStatus.CONFLICT
+                )
         try:
             with db() as conn:
                 cur = conn.execute(
                     "INSERT INTO students (full_name, email, password_salt, password_hash,"
                     " level, phone, status, created_at, premium_until, plain_password)"
                     " VALUES (?,?,?,?,?,?,?,?,?,?)",
-                    (name, email, salt, hash_password(password, salt), level, phone, "active", now, premium_until, password),
+                    (name, email if email else None, salt, hash_password(password, salt), level, phone, "active", now, premium_until, password),
                 )
                 new_id = cur.lastrowid
         except sqlite3.IntegrityError:

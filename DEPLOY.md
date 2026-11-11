@@ -31,7 +31,7 @@ Ilovaning haqiqiy havolasi: **https://sprichde-original.onrender.com/**
 |--------|-----|
 | Ilova (kirish) | https://sprichde-original.onrender.com/ |
 | Admin panel | https://sprichde-original.onrender.com/admin.html |
-| Demo o'quvchi | aziza@example.com / demo1234 (va bekzod / dilnoza ham) |
+| Demo o'quvchi | `+998 90 111 22 33` / `demo1234` (va bekzod `+998 91 222 33 44` / dilnoza `+998 93 333 44 55`) |
 | Admin | admin@sprichde.uz / admin123 |
 
 ## Muhim ogohlantirishlar
