@@ -215,6 +215,11 @@ function formatStudentDate(value) {
     : new Intl.DateTimeFormat('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
 }
 
+function fmtPrice(v) {
+  const n = Number(v || 0);
+  return Number.isFinite(n) ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : String(v);
+}
+
 function paymentCell(x) {
   const p = x.payment;
   const days = Number(x.premiumDaysLeft || 0);
@@ -231,7 +236,7 @@ function paymentCell(x) {
 
   if (p.status === 'pending') {
     return `<span class="tag draft">Kutilmoqda</span>
-      <div class="table-secondary">${p.months} oylik · ${esc(methodLabel(p.method))}</div>
+      <div class="table-secondary">${p.months} oylik · <b style="color:#1c2434">${fmtPrice(p.amount)} so‘m</b> · ${esc(methodLabel(p.method))}</div>
       <div class="pay-actions">
         <button class="mini ok" data-pay-confirm="${p.id}">Tasdiqlash</button>
         <button class="mini bad" data-pay-reject="${p.id}">Rad etish</button>
@@ -248,7 +253,7 @@ function paymentCell(x) {
   // paid
   const when = p.reviewedAt || p.createdAt;
   return `<span class="tag ok">To‘langan</span>
-    <div class="table-secondary">${p.months} oylik · ${esc(methodLabel(p.method))}</div>
+    <div class="table-secondary">${p.months} oylik · <b style="color:#1c2434">${fmtPrice(p.amount)} so‘m</b> · ${esc(methodLabel(p.method))}</div>
     ${premiumLine}
     ${when ? `<div class="table-secondary">${formatStudentDate(when)}</div>` : ''}
     <div class="pay-actions">

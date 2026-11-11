@@ -596,7 +596,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
     <div class="pay-plans" id="payPlans"></div>
 
     <label class="pay-label" for="payPayer">To‘lov qilgan karta raqami (ixtiyoriy)</label>
-    <input class="pay-input" id="payPayer" inputmode="numeric" maxlength="19" placeholder="8600 0000 0000 0000">
+    <input class="pay-input" id="payPayer" inputmode="numeric" maxlength="23" placeholder="8600 0000 0000 0000" autocomplete="off">
 
     <div class="pay-methods" id="payMethods">
       <button type="button" data-method="uzcard" class="active">Uzcard</button>
@@ -606,7 +606,7 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
 
     <div class="pay-status" id="payStatus"></div>
     <button class="pay-submit" id="paySubmit" type="button">To‘lov qildim</button>
-    <p class="pay-note">To‘lov administrator tasdiqlagach premium faollashadi. To‘lovlar 9860170110162592 kartasiga tushadi.</p>
+    <p class="pay-note" id="payNote"></p>
     <button class="pay-close" id="payClose" type="button">Yopish</button>
   </div>
 </div>
@@ -627,9 +627,9 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
 // ============================================================
 const TOTAL_DAYS = 91;
 const FALLBACK_PLANS = [
-  { months: 3, days: 91 },
-  { months: 6, days: 182 },
-  { months: 12, days: 365 },
+  { months: 3, days: 91, price: 530000 },
+  { months: 6, days: 182, price: 790000 },
+  { months: 12, days: 365, price: 1200000 },
 ];
 
 let profile = null;
@@ -928,7 +928,7 @@ function formatCard(value) {
 
 function escPrice(value) {
   const n = Number(value);
-  return Number.isFinite(n) ? n.toLocaleString('uz-UZ') : String(value);
+  return Number.isFinite(n) ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : String(value);
 }
 
 function planList() {
@@ -948,7 +948,9 @@ function renderPlans() {
   box.querySelectorAll('[data-plan]').forEach((btn) => btn.addEventListener('click', () => {
     selectedPlan = Number(btn.dataset.plan);
     box.querySelectorAll('.pay-plan').forEach((x) => x.classList.toggle('active', x === btn));
+    updatePayNote();
   }));
+  updatePayNote();
 }
 
 async function loadPaymentInfo() {
@@ -1008,6 +1010,23 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !el('payBg').hidden) closePayment();
 });
 
+function updatePayNote() {
+  const plans = planList();
+  const plan = plans.find((p) => p.months === selectedPlan) || plans[0];
+  const price = plan && plan.price ? escPrice(plan.price) + ' so‘m' : 'narx';
+  const note = el('payNote');
+  if (note) {
+    note.innerHTML = 'Avval <b>9860 1701 1016 2592</b> kartasiga <b>' + price + '</b> o‘tkazing, so‘ng «To‘lov qildim» tugmasini bosing. To‘lov administrator tasdiqlagach premium faollashadi.';
+  }
+}
+
+// Karta raqamini 4 tadan bo'lib yozish
+const payPayerInput = document.querySelector('#payPayer');
+payPayerInput.addEventListener('input', () => {
+  const digits = payPayerInput.value.replace(/\D/g, '').slice(0, 19);
+  payPayerInput.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+});
+
 document.querySelectorAll('#payMethods button').forEach((btn) => btn.addEventListener('click', () => {
   selectedMethod = btn.dataset.method;
   document.querySelectorAll('#payMethods button').forEach((b) =>
@@ -1029,7 +1048,15 @@ el('payCopy').addEventListener('click', async () => {
 el('paySubmit').addEventListener('click', async () => {
   const btn = el('paySubmit');
   const box = el('payStatus');
+  const payerDigits = el('payPayer').value.replace(/\D/g, '');
+  if (payerDigits && payerDigits.length !== 16 && payerDigits.length !== 19) {
+    box.className = 'pay-status show warn';
+    box.textContent = 'Karta raqami 16 (yoki 19) raqamdan iborat bo‘lishi kerak.';
+    el('payPayer').focus();
+    return;
+  }
   btn.disabled = true;
+  btn.textContent = 'Yuborilmoqda…';
   box.className = 'pay-status show warn';
   box.textContent = 'Yuborilmoqda…';
   try {
@@ -1043,6 +1070,7 @@ el('paySubmit').addEventListener('click', async () => {
     });
     latestPayment = res.payment;
     el('payPayer').value = '';
+    btn.textContent = 'To‘lov qildim';
     box.className = 'pay-status show ok';
     box.textContent = res.message || 'To‘lov so‘rovi yuborildi. Admin tasdiqlashini kuting.';
     paintPremium();
@@ -1052,6 +1080,7 @@ el('paySubmit').addEventListener('click', async () => {
     box.textContent = err.message;
   } finally {
     btn.disabled = false;
+    btn.textContent = 'To‘lov qildim';
   }
 });
 

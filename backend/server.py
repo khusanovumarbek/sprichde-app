@@ -71,6 +71,7 @@ PAYMENT_HOLDER = "SprichDe"
 PAYMENT_WINDOW_PERIODS = {3: 91, 6: 182, 12: 365}
 DEFAULT_PREMIUM_DAYS = 91
 PAYMENT_METHODS = ("uzcard", "humo", "visa")
+PAYMENT_PRICES = {3: 530000, 6: 790000, 12: 1200000}  # so‘m
 
 
 # --------------------------------------------------------------------------- #
@@ -809,7 +810,7 @@ class Handler(SimpleHTTPRequestHandler):
                 "months": months,
                 "days": days,
                 "label": f"{months} oylik",
-                "price": None,
+                "price": PAYMENT_PRICES.get(months),
             }
             for months, days in PAYMENT_WINDOW_PERIODS.items()
         ]
@@ -833,6 +834,11 @@ class Handler(SimpleHTTPRequestHandler):
             months = 0
         method = str(data.get("method") or "uzcard").strip().lower()
         payer_card = re.sub(r"\D", "", str(data.get("payerCard") or ""))[:19]
+        if payer_card and len(payer_card) not in (16, 19):
+            return self.send_json(
+                {"error": "Karta raqami 16 (yoki 19) raqamdan iborat bo‘lishi kerak."},
+                HTTPStatus.BAD_REQUEST,
+            )
         if months not in PAYMENT_WINDOW_PERIODS:
             return self.send_json(
                 {"error": "To‘lov rejasi noto‘g‘ri tanlangan."}, HTTPStatus.BAD_REQUEST
@@ -846,14 +852,14 @@ class Handler(SimpleHTTPRequestHandler):
             cur = conn.execute(
                 "INSERT INTO payments (student_id, plan_months, amount, method, payer_card,"
                 " status, created_at) VALUES (?,?,?,?,?,?,?)",
-                (session["ref_id"], months, 0, method, payer_card, "pending", now),
+                (session["ref_id"], months, PAYMENT_PRICES.get(months, 0), method, payer_card, "pending", now),
             )
             row = conn.execute("SELECT * FROM payments WHERE id = ?", (cur.lastrowid,)).fetchone()
         self.send_json(
             {
                 "ok": True,
                 "payment": payment_public(row),
-                "message": "To‘lov so‘rovi yuborildi. Admin tasdiqlagach premium faollashadi.",
+                "message": "To‘lov so‘rovi yuborildi: " + format(PAYMENT_PRICES.get(months, 0), ",.0f").replace(",", " ") + " so‘m. Admin tasdiqlagach premium faollashadi.",
             },
             HTTPStatus.CREATED,
         )
