@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fc">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1b33">
+<title>SprichDe · Ustozlar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="auth.js"></script>
+<script src="theme.js"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="application-name" content="SprichDe">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<script src="pwa.js" defer></script>
+<link rel="stylesheet" href="theme.css">
+<style>
+:root{font-family:Inter,"Segoe UI",Arial,sans-serif;--blue:var(--primary);--blue-dark:var(--primary-2);--muted:#788196;--line:#e9ebf2;--soft:#e7efff;--shadow:0 10px 26px #1d2b4b0f}
+html{overflow-x:hidden}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);overflow-x:hidden}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right));position:sticky;top:0;z-index:5}
+.back{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px;text-decoration:none;color:var(--text)}
+.topbar b{font-size:16px;font-weight:800}
+.wrap{max-width:520px;margin:0 auto;padding:22px 20px 60px;padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
+
+.hero{position:relative;border-radius:24px;overflow:hidden;padding:26px 22px;color:#fff;min-height:190px;
+  background:
+    radial-gradient(140% 90% at 15% 110%, rgba(255,255,255,.16) 0%, transparent 55%),
+    radial-gradient(120% 80% at 85% -10%, rgba(255,255,255,.12) 0%, transparent 50%),
+    linear-gradient(155deg,#0b5a3f 0%,#127a4e 45%,#1d9c63 100%);box-shadow:var(--shadow)}
+.hero small{font-size:10px;font-weight:800;letter-spacing:2px;color:#ffffffcc}
+.hero b{display:block;font-size:24px;font-weight:800;margin-top:8px;line-height:1.2}
+.hero p{margin:8px 0 0;font-size:12px;color:#ffffffd9;line-height:1.55;max-width:220px}
+.hero .big{position:absolute;right:18px;bottom:14px;font-size:74px;opacity:.85;filter:drop-shadow(0 6px 14px #0006)}
+
+.section{margin-top:22px}
+.section h2{font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 4px 10px}
+.teacher{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);margin-bottom:10px}
+.t-avatar{width:52px;height:52px;flex:none;border-radius:16px;display:grid;place-items:center;font-size:20px;font-weight:800;color:#fff}
+.t-a1{background:linear-gradient(135deg,#e0a93e,#b8860b)}
+.t-a2{background:linear-gradient(135deg,#2f7a4a,#1d4a2a)}
+.t-a3{background:linear-gradient(135deg,#6d5ef0,#4f3bd1)}
+.t-info{flex:1;min-width:0}
+.t-info b{display:block;font-size:14px;font-weight:800}
+.t-info small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.t-chip{font-size:9.5px;font-weight:800;letter-spacing:.6px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:4px 10px;white-space:nowrap}
+.t-soon{display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px 18px;border-radius:18px;border:1.5px dashed var(--line);background:var(--surface-2);color:var(--muted);text-align:center}
+.t-soon b{color:var(--text);font-size:14px}
+.t-soon small{font-size:11px;line-height:1.5}
+.note{margin-top:18px;font-size:10.5px;color:var(--muted);text-align:center;line-height:1.6}
+@media (max-width:380px){
+  .hero b{font-size:20px}.hero .big{font-size:60px}
+  .wrap{padding-top:14px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="back" href="app.html" aria-label="Orqaga">←</a>
+  <b>Ustozlarimiz</b>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <small>USTOZLAR</small>
+    <b>Ustozlarimiz —<br>sizga kuchli yordam</b>
+    <p>Nemis tili o‘qituvchilar jamoasi tez orada seanslar va darslar uchun sizga ochiladi.</p>
+    <span class="big">🎓</span>
+  </div>
+
+  <div class="section">
+    <h2>Ustozlar</h2>
+
+    <div class="teacher">
+      <span class="t-avatar t-a1">L</span>
+      <span class="t-info">
+        <b>Lara Schmidt</b>
+        <small>A1–A2 darajalar uchun o‘qituvchi · Berlin</small>
+      </span>
+      <span class="t-chip">TEZ ORADA</span>
+    </div>
+
+    <div class="teacher">
+      <span class="t-avatar t-a2">L</span>
+      <span class="t-info">
+        <b>Lukas Wagner</b>
+        <small>B1–B2 darajalar uchun o‘qituvchi · Myunxen</small>
+      </span>
+      <span class="t-chip">TEZ ORADA</span>
+    </div>
+
+    <div class="teacher">
+      <span class="t-avatar t-a3">A</span>
+      <span class="t-info">
+        <b>Anna Weber</b>
+        <small>Imtihon tayyorgarligi · TestDaF · Goethe-Zertifikat</small>
+      </span>
+      <span class="t-chip">TEZ ORADA</span>
+    </div>
+  </div>
+
+  <div class="t-soon">
+    <div style="font-size:38px">📚</div>
+    <b>Ustozlar bilan jonli darslar</b>
+    <small>Ustozlarimiz bilan jonli va guruhli darslar, imtihon tayyorgarligi va savol-javob sessiyalari tez orada taqdim etiladi.</small>
+  </div>
+
+  <p class="note">Bu bo‘lim tayyorlanmoqda — ustozlar va dars jadvallari keyingi yangilanishda qo‘shiladi.</p>
+</div>
+
+<script>
+(async function initUstozlar() {
+  const me = await guard('student');
+  if (!me) return;
+})();
+</script>
+</body>
+</html>

@@ -57,6 +57,34 @@ body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;-webkit-fo
   background-position:center,center 30%,center;
 }
 .journey-card:active{transform:scale(.99)}
+
+/* ---------- Hero karusel (91 kun / Ustozlar) ---------- */
+.hero-carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  margin-top:20px;border-radius:26px;box-shadow:var(--shadow);-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}
+.hero-carousel::-webkit-scrollbar{display:none}
+.hero-carousel > *{min-width:100%;scroll-snap-align:start}
+.hero-carousel .journey-card{margin-top:0;border-radius:0;box-shadow:none;min-height:210px}
+.j-ustoz{position:relative;display:block;text-decoration:none;color:#fff;min-height:210px;overflow:hidden;
+  background:
+    radial-gradient(140% 90% at 15% 110%, rgba(255,255,255,.18) 0%, transparent 55%),
+    radial-gradient(120% 80% at 85% -10%, rgba(255,255,255,.14) 0%, transparent 50%),
+    linear-gradient(155deg,#0b5a3f 0%,#127a4e 45%,#1d9c63 100%)}
+.j-ustoz:active{transform:scale(.99)}
+.j-ustoz .u-icon{position:absolute;right:16px;top:22px;font-size:78px;opacity:.9;filter:drop-shadow(0 6px 16px #0000004d)}
+.u-content{position:relative;padding:22px;z-index:2}
+.u-eyebrow{font-size:10.5px;font-weight:800;letter-spacing:2px;color:#ffffffcc}
+.u-title{display:block;font-size:26px;font-weight:800;margin-top:6px;line-height:1.15;text-shadow:0 2px 10px rgba(0,20,10,.35)}
+.u-sub{margin:6px 0 0;font-size:12.5px;color:#ffffffd9;text-shadow:0 1px 6px rgba(0,20,10,.3);max-width:260px}
+.u-soon{display:inline-block;margin-top:14px;font-size:10px;font-weight:800;letter-spacing:1px;color:#063;background:#ffe9a8;border-radius:20px;padding:5px 12px}
+.u-avatars{display:flex;gap:6px;margin-top:16px}
+.u-avatar{width:38px;height:38px;border-radius:50%;border:2px solid #ffffff55;display:grid;place-items:center;font-size:14px;font-weight:800;background:#ffffff2e;backdrop-filter:blur(4px)}
+.u-avatar:nth-child(1){background:#ffd98a}.u-avatar:nth-child(2){background:#a8e6b8}.u-avatar:nth-child(3){background:#9cc5ff}
+.u-go{position:absolute;right:20px;bottom:20px;font-size:12px;font-weight:700;color:#fff;background:#ffffff2e;border:1px solid #ffffff45;padding:8px 15px;border-radius:20px;z-index:2;backdrop-filter:blur(6px)}
+.hero-dots{display:flex;justify-content:center;gap:7px;margin-top:10px}
+.hero-dot{width:7px;height:7px;border-radius:50%;border:0;background:#c8d0e0;cursor:pointer;padding:0;transition:all .22s}
+.hero-dot.active{width:22px;border-radius:20px;background:var(--blue)}
+
 .j-overlay{position:absolute;inset:0;background:
   radial-gradient(120% 80% at 80% 10%, transparent 40%, rgba(16,28,52,.35) 100%)}
 .j-content{position:relative;padding:22px 22px 18px;z-index:2}
@@ -416,18 +444,32 @@ html[data-theme="dark"] .pay-status.warn{background:#3c3218;color:#f0c96a}
       <button class="avatar" id="userAvatar" type="button" aria-label="Profilga o‘tish" title="Profilga o‘tish">?</button>
     </div>
 
-    <!-- 91 kunlik sayohat (katta karta) -->
-    <a class="journey-card" href="journey.html">
-      <div class="j-overlay"></div>
-      <div class="j-content">
-        <small class="j-eyebrow">SAYOHAT</small>
-        <b class="j-title">91 kunlik sayohat</b>
-        <p class="j-sub">Har kuni bir qadam — katta natija sari</p>
-        <div class="j-track"><div class="j-fill" id="journeyFill"></div></div>
-        <div class="j-meta"><span id="journeyDays">0 / 91 kun</span><span id="journeyPct">0%</span></div>
-      </div>
-      <span class="j-go">Boshlash ›</span>
-    </a>
+    <!-- Hero karusel: 91 kunlik sayohat / Ustozlar -->
+    <div class="hero-carousel" id="heroCarousel" aria-label="Bosh banner">
+      <a class="journey-card" href="journey.html">
+        <div class="j-overlay"></div>
+        <div class="j-content">
+          <small class="j-eyebrow">SAYOHAT</small>
+          <b class="j-title">91 kunlik sayohat</b>
+          <p class="j-sub">Har kuni bir qadam — katta natija sari</p>
+          <div class="j-track"><div class="j-fill" id="journeyFill"></div></div>
+          <div class="j-meta"><span id="journeyDays">0 / 91 kun</span><span id="journeyPct">0%</span></div>
+        </div>
+        <span class="j-go">Boshlash ›</span>
+      </a>
+      <a class="j-ustoz" href="ustozlar.html" aria-label="Ustozlarimiz">
+        <span class="u-icon">🎓</span>
+        <div class="u-content">
+          <small class="u-eyebrow">USTOZLAR</small>
+          <b class="u-title">Ustozlarimiz</b>
+          <p class="u-sub">Nemis tili o‘qituvchilar jamoasi — sizga kuchli yordam</p>
+          <span class="u-soon">TEZ ORADA</span>
+          <div class="u-avatars"><span class="u-avatar">L</span><span class="u-avatar">A</span><span class="u-avatar">+</span></div>
+        </div>
+        <span class="u-go">Batafsil ›</span>
+      </a>
+    </div>
+    <div class="hero-dots" id="heroDots" aria-hidden="true"><button class="hero-dot active" type="button" aria-label="1-slayd"></button><button class="hero-dot" type="button" aria-label="2-slayd"></button></div>
 
     <!-- Sinov darsi (do'stni taklif qilishdan tepasida) -->
     <a class="feature tryout" id="trialFeature" href="day.html?day=1">
@@ -875,6 +917,30 @@ function paintReyting(data) {
     ? topHtml + meHtml
     : '<div class="reyt-list-empty">Hozircha hech kim o‘rganmagan — birinchi bo‘ling!</div>');
 }
+
+// ---------- Hero karusel ----------
+(function () {
+  const carousel = document.getElementById('heroCarousel');
+  const dots = document.querySelectorAll('.hero-dot');
+  if (!carousel || !dots.length) return;
+  const sync = () => {
+    const idx = Math.round(carousel.scrollLeft / carousel.clientWidth);
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  };
+  carousel.addEventListener('scroll', sync, { passive: true });
+  dots.forEach((d, i) => d.addEventListener('click', () => {
+    carousel.scrollTo({ left: i * carousel.clientWidth, behavior: 'smooth' });
+  }));
+  if (location.hash === '#ustoz') {
+    const go = () => {
+      const c = document.getElementById('heroCarousel');
+      if (!c || c.clientWidth < 10) { setTimeout(go, 60); return; }
+      c.scrollTo({ left: c.clientWidth, behavior: 'instant' });
+      sync();
+    };
+    go();
+  }
+})();
 
 // ---------- Navigatsiya ----------
 function openProfileView() {
