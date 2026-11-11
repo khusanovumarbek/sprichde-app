@@ -931,6 +931,27 @@ function paintReyting(data) {
   dots.forEach((d, i) => d.addEventListener('click', () => {
     carousel.scrollTo({ left: i * carousel.clientWidth, behavior: 'smooth' });
   }));
+  // Har 2 soniyada avtomatik aylanish
+  const INTERVAL = 2000;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let timer = null;
+  const advance = () => {
+    const idx = Math.round(carousel.scrollLeft / carousel.clientWidth);
+    const count = carousel.children.length;
+    const next = (idx + 1) % count;
+    carousel.scrollTo({ left: next * carousel.clientWidth, behavior: 'smooth' });
+  };
+  const start = () => { if (!reduced && !timer) timer = setInterval(advance, INTERVAL); };
+  const stop = () => { clearInterval(timer); timer = null; };
+  carousel.addEventListener('pointerenter', stop);
+  carousel.addEventListener('pointerleave', start);
+  carousel.addEventListener('touchstart', stop, { passive: true });
+  carousel.addEventListener('touchend', () => {
+    stop();
+    setTimeout(start, 2500);
+  }, { passive: true });
+  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  start();
   if (location.hash === '#ustoz') {
     const go = () => {
       const c = document.getElementById('heroCarousel');
